@@ -1,0 +1,104 @@
+Gender,Course,Study Year,CGPA,Study Days per Week,Study Hours per Day,Study Hours Before Exam,Study Method,Study Schedule,Follow Schedule Frequency,Procrastination Level,Deadline Management,Social Media During Study,Part-Time Job,Work Hours per Week,Study Place,Family Support,Sleep Hours,Stress Level (Beginning of Semester),Stress Level (End of Semester)
+Male,Bachelor of Education,2,3.5,6,5.5,3.5,Summarizing/making notes,Yes,Always,2,Good,Sometimes,No,0.0,"Library, Room, Campus Study Area",Very Supportive,6.5,2,4
+Female,Diploma in Computer Science,3,3.5,5,3.5,7.0,Doing practice questions,No,,3,Average,Always,No,0.0,"Library, Room",Very Supportive,4.5,2,4
+Female,Diploma in Science ,2,3.5,7,5.5,7.0,Doing practice questions,Yes,Always,2,Good,Sometimes,No,0.0,Room,Very Supportive,4.5,3,4
+Female,Bachelor of Information Technology,2,3.5,6,5.5,3.5,Summarizing/making notes,Yes,Sometimes,3,Average,Always,No,0.0,Room,Very Supportive,4.5,2,4
+Female,Bachelor of Civil Engineering,2,3.5,3,3.5,5.5,Doing practice questions,No,,3,Good,Sometimes,No,0.0,"Room, Campus Study Area",Neutral,3.0,3,4
+Male,Bachelor of Computer Science,1,3.5,1,1.5,3.5,Summarizing/making notes,No,,5,Average,Always,No,0.0,Room,Neutral,6.5,1,4
+Male,Bachelor of Computer Science,1,3.5,3,1.5,7.0,Reading lecture notes,No,,4,Poor,Always,No,0.0,"Room, Campus Study Area",Neutral,4.5,3,4
+Female,Bachelor of Business ,2,3.5,3,3.5,7.0,Summarizing/making notes,No,,2,Good,Sometimes,No,0.0,"Library, Room, Cafe",Neutral,8.5,1,4
+Female,Bachelor of Accounting,1,3.5,4,1.5,3.5,Summarizing/making notes,No,,4,Average,Always,No,0.0,"Library, Room",Very Supportive,4.5,2,5
+Female,Bachelor of Business ,2,3.5,3,3.5,7.0,Doing practice questions,Yes,Sometimes,5,Average,Always,No,0.0,"Library, Room",Very Supportive,4.5,1,5
+Female,Bachelor of Accounting ,2,3.5,3,5.5,7.0,Doing practice questions,No,,4,Average,Sometimes,No,0.0,"Room, Cafe",Very Supportive,4.5,2,5
+Female,Bachelor of Accounting ,3,3.5,5,3.5,7.0,Doing practice questions,Yes,Sometimes,4,Good,Always,No,0.0,"Library, Room",Very Supportive,4.5,3,4
+Female,Bachelor of Medicine Bachelor of Surgery (MBBS ),2,3.5,5,5.5,7.0,Reading lecture notes,Yes,Sometimes,3,Average,Sometimes,No,0.0,"Room, Cafe",Very Supportive,3.0,3,5
+Female,Bachelor of Computer Science Informatics Maritime ,1,3.5,5,3.5,7.0,Doing practice questions,Yes,Sometimes,2,Good,Sometimes,No,0.0,"Library, Room",Neutral,4.5,2,4
+Female,Bachelor of Medicine Bachelor of Surgery (MBBS ),2,3.5,6,1.5,7.0,Reading lecture notes,No,,4,Good,Sometimes,No,0.0,House,Very Supportive,4.5,2,5
+Female,Bachelor of Islamic Education,2,3.5,5,3.5,3.5,Summarizing/making notes,Yes,Sometimes,3,Average,Sometimes,No,0.0,Campus Study Area,Neutral,6.5,5,5
+Female,Bachelor of Chemical Engineering ,2,3.5,6,5.5,7.0,Doing practice questions,No,,5,Poor,Always,No,0.0,Room,Neutral,4.5,1,5
+Female,Bachelor of Accounting ,2,3.5,4,1.5,5.5,Summarizing/making notes,No,,4,Average,Always,No,0.0,Room,Neutral,4.5,2,5
+Female,Bachelor of Chemical Engineering ,2,3.5,1,1.5,3.5,Doing practice questions,No,,5,Average,Sometimes,No,0.0,Room,Very Supportive,6.5,3,5
+Female,Bachelor of Medicine,2,3.5,7,3.5,7.0,Reading lecture notes,Yes,Sometimes,3,Average,Sometimes,No,0.0,"Library, Room, Cafe",Very Supportive,4.5,2,4
+Female,Bachelor of Islamic Banking and Finance,2,3.5,3,3.5,3.5,Doing practice questions,No,,4,Average,Always,No,0.0,"Library, Room, Campus Study Area",Neutral,4.5,4,3
+Female,Bachelor of Pharmacy,2,3.5,3,1.5,3.5,Summarizing/making notes,No,,5,Good,Always,No,0.0,Room,Very Supportive,4.5,2,4
+Female,Bachelor of Accounting ,1,3.5,6,3.5,5.5,Doing practice questions,Yes,Sometimes,5,Average,Sometimes,No,0.0,"Library, Room",Very Supportive,6.5,2,5
+Female,Bachelor of Teaching English as a Second Language (TESL),2,3.5,4,1.5,3.5,Doing practice questions,No,,4,Good,Sometimes,No,0.0,Room,Very Supportive,6.5,3,5
+Female,Bachelor of Medicine Bachelor of Surgery (MBBS ),2,3.5,2,0.5,7.0,Summarizing/making notes,No,,5,Average,Always,No,0.0,"Room, Cafe",Neutral,4.5,3,5
+Female,Bachelor of Accounting ,2,3.5,4,1.5,7.0,Doing practice questions,Yes,Sometimes,3,Good,Sometimes,No,0.0,Room,Neutral,4.5,1,4
+Female,Bachelor of Computer Science ,2,3.5,2,0.5,7.0,Doing practice questions,No,,3,Average,Always,No,0.0,Room,Very Supportive,6.5,3,3
+Female,Bachelor of Education,2,3.5,3,1.5,3.5,Summarizing/making notes,No,,4,Average,Always,No,0.0,Room,Neutral,4.5,1,1
+Female,Bachelor of Psychology,1,3.5,6,1.5,7.0,Reading lecture notes,No,,5,Good,Always,No,0.0,"Library, Room",Very Supportive,8.5,2,5
+Male,Bachelor of Computer Science ,2,3.5,5,5.5,7.0,Summarizing/making notes,Yes,Always,4,Average,Never,No,0.0,"Library, Room, Cafe, Campus Study Area",Very Supportive,6.5,1,5
+Female,Bachelor of Computer Science,2,3.5,5,1.5,3.5,Doing practice questions,No,,3,Average,Never,Yes,7.5,Room,Very Supportive,8.5,1,4
+Female,Bachelor of Arts,1,3.5,5,1.5,3.5,Summarizing/making notes,No,,3,Good,Sometimes,No,0.0,"Library, Room",Very Supportive,4.5,4,3
+Female,Bachelor of Information Technology ,2,3.5,3,1.5,7.0,Doing practice questions,No,,3,Good,Sometimes,No,0.0,"Library, Room, Campus Study Area",Very Supportive,4.5,1,5
+Male,Bachelor of Computer Science ,2,3.5,3,1.5,3.5,Watching recorded lectures/videos,No,,3,Good,Sometimes,Yes,7.5,"Library, Room",Very Supportive,6.5,3,1
+Female,Bachelor of Biomedical Sciences ,2,3.5,4,3.5,7.0,Summarizing/making notes,No,,3,Good,Sometimes,No,0.0,Room,Very Supportive,6.5,2,4
+Female,Bachelor of Medicine Bachelor of Surgery (MBBS ),2,3.5,7,5.5,7.0,Summarizing/making notes,Yes,Sometimes,3,Good,Sometimes,No,0.0,Room,Neutral,4.5,1,5
+Female,Bachelor of Computer Science,2,3.5,5,3.5,5.5,Doing practice questions,No,,4,Good,Sometimes,Yes,7.5,"Room, Campus Study Area",Very Supportive,4.5,2,4
+Female,Bachelor of Pharmacy ,2,3.5,5,1.5,7.0,Reading lecture notes,Yes,Sometimes,3,Average,Always,No,0.0,"Library, Room",Very Supportive,4.5,3,5
+Female,Bachelor of Business Management,2,3.5,3,1.5,3.5,Doing practice questions,No,,4,Good,Sometimes,No,0.0,"Room, Campus Study Area",Very Supportive,4.5,2,4
+Female,Bachelor of Teaching English as a Second Language (TESL),3,3.5,4,1.5,3.5,Summarizing/making notes,Yes,Sometimes,4,Average,Sometimes,No,0.0,"Library, Room, Campus Study Area",Neutral,6.5,1,1
+Female,Bachelor of Islamic Course,3,3.5,5,1.5,5.5,Summarizing/making notes,No,,4,Average,Sometimes,Yes,2.5,"Library, Room, Campus Study Area",Neutral,4.5,2,4
+Female,Bachelor of International Business,1,3.5,3,3.5,5.5,Doing practice questions,Yes,Sometimes,4,Average,Sometimes,No,0.0,"Library, Room",Neutral,6.5,2,4
+Female,Bachelor of Accounting ,3,3.5,4,1.5,7.0,Doing practice questions,Yes,Sometimes,4,Good,Sometimes,No,0.0,Library,Very Supportive,6.5,2,5
+Male,Bachelor of Computer Science,1,3.5,7,0.5,7.0,Reading lecture notes,Yes,Always,1,Good,Sometimes,No,0.0,"Library, Room, Cafe, Campus Study Area",Very Not Supportive,10.0,3,2
+Female,Bachelor of Dental Surgery,2,3.5,4,3.5,5.5,Summarizing/making notes,No,,3,Average,Sometimes,No,0.0,"Library, Room",Very Supportive,6.5,3,4
+Female,Bachelor of Computer Science,1,4.0,6,5.5,7.0,Summarizing/making notes,No,,5,Average,Always,No,0.0,Campus Study Area,Very Supportive,6.5,4,4
+Female,Bachelor of Pharmacy,2,3.5,4,3.5,7.0,Summarizing/making notes,No,,3,Good,Sometimes,No,0.0,"Library, Room",Very Supportive,4.5,1,5
+Female,Bachelor of Accounting ,1,3.5,5,3.5,7.0,Summarizing/making notes,No,,3,Good,Always,No,0.0,"Library, Room, Cafe, Campus Study Area",Very Supportive,6.5,1,5
+Female,Bachelor of Medicine Bachelor of Surgery (MBBS ),2,3.5,7,5.5,7.0,Watching recorded lectures/videos,No,,3,Average,Always,No,0.0,"Library, Campus Study Area",Very Supportive,4.5,4,4
+Female,Bachelor of Medicine Bachelor of Surgery (MBBS ),2,3.5,7,5.5,5.5,Reading lecture notes,No,,3,Average,Sometimes,No,0.0,Room,Very Supportive,4.5,4,5
+Female,Bachelor of Accounting ,3,3.5,3,5.5,7.0,Doing practice questions,No,,4,Good,Always,No,0.0,Room,Very Supportive,8.5,2,5
+Female,Bachelor of Investment Management,2,3.5,6,1.5,5.5,Summarizing/making notes,Yes,Sometimes,2,Good,Sometimes,No,0.0,"Room, Campus Study Area",Very Supportive,4.5,1,5
+Female,Bachelor of Business,2,3.5,2,1.5,7.0,Summarizing/making notes,No,,4,Average,Always,No,0.0,Room,Very Supportive,4.5,2,3
+Female,Bachelor of Accounting,1,3.5,5,3.5,3.5,Summarizing/making notes,No,,3,Poor,Always,No,0.0,Room,Neutral,4.5,2,4
+Female,Bachelor of Science in Chemistry ,2,3.5,5,1.5,7.0,Summarizing/making notes,No,,3,Average,Always,No,0.0,Room,Very Supportive,8.5,1,4
+Female,Bachelor of Arabic,2,3.5,5,1.5,3.5,Reading lecture notes,Yes,Sometimes,3,Average,Always,No,0.0,Room,Very Supportive,6.5,4,4
+Female,Bachelor of Teaching English as a Second Language (TESL),2,3.5,3,1.5,3.5,Summarizing/making notes,No,,3,Good,Sometimes,No,0.0,At my house,Very Supportive,4.5,2,4
+Male,Bachelor of Computer Science,2,2.5,5,3.5,5.5,Summarizing/making notes,Yes,Always,2,Average,Sometimes,No,0.0,"Library, Room",Very Not Supportive,3.0,1,5
+Male,Bachelor of Mass Communication ,1,4.0,3,1.5,3.5,Summarizing/making notes,No,,4,Good,Sometimes,No,0.0,"Library, Room",Very Supportive,6.5,3,2
+Male,Bachelor of Software Engineering ,2,3.5,5,5.5,5.5,Reading lecture notes,No,,4,Average,Always,No,0.0,Room,Neutral,6.5,4,5
+Female,Bachelor of Civil Engineering,2,3.5,5,3.5,7.0,Doing practice questions,No,,4,Average,Sometimes,No,0.0,Campus Study Area,Very Supportive,6.5,3,5
+Female,Bachelor of Mechanical Engineering ,2,3.5,2,3.5,1.5,Doing practice questions,No,,3,Average,Never,No,0.0,Room,Neutral,3.0,1,4
+Male,Bachelor of Accounting,1,3.5,7,3.5,7.0,Doing practice questions,No,,3,Average,Sometimes,No,0.0,Room,Very Supportive,6.5,1,4
+Male,Bachelor in Accounting Fintech ,2,3.5,7,3.5,3.5,Doing practice questions,Yes,Always,2,Good,Sometimes,No,0.0,Room,Very Supportive,8.5,4,5
+Female,Bachelor of Electrical and Electronics Engineering,2,3.5,5,1.5,5.5,Summarizing/making notes,No,,4,Average,Sometimes,No,0.0,"Library, Room, Cafe, Campus Study Area",Very Supportive,8.5,4,5
+Female,Bachelor of Science,2,4.0,6,3.5,7.0,Summarizing/making notes,Yes,Sometimes,4,Good,Sometimes,No,0.0,"Library, Room",Very Supportive,6.5,2,4
+Female,Bachelor of Medical Imaging,2,3.5,5,3.5,7.0,Summarizing/making notes,Yes,Sometimes,3,Average,Sometimes,No,0.0,"Room, Campus Study Area",Very Supportive,6.5,3,5
+Female,Bachelor of Computer Science,2,3.5,3,1.5,7.0,Doing practice questions,No,,5,Average,Always,No,0.0,Room,Very Supportive,6.5,1,4
+Female,Bachelor Of Home Science With Education,2,3.5,4,1.5,3.5,Summarizing/making notes,No,,2,Good,Always,Yes,2.5,Room,Very Supportive,8.5,2,4
+Female,Bachelor of Mass Communications ,2,3.5,5,3.5,5.5,Doing practice questions,No,,4,Average,Always,No,0.0,Room,Very Supportive,6.5,2,5
+Female,Bachelor of Chemical Engineering,2,3.5,4,3.5,7.0,Summarizing/making notes,No,,4,Good,Always,Yes,2.5,"Library, Room, Campus Study Area",Very Supportive,8.5,3,5
+Female,Bachelor of Business ,2,3.5,2,3.5,5.5,Summarizing/making notes,No,,5,Average,Always,No,0.0,"Library, Room",Very Supportive,6.5,5,5
+Female,Bachelor of Statistic ,2,3.5,5,5.5,7.0,Doing practice questions,Yes,Sometimes,4,Average,Always,No,0.0,Room,Very Supportive,4.5,4,5
+Female,Diploma in Early Childhood Education ,2,2.5,3,1.5,3.5,Summarizing/making notes,No,,3,Average,Sometimes,No,0.0,"Library, Room, Cafe, Campus Study Area",Neutral,6.5,4,4
+Female,Diploma in Science,2,3.5,5,5.5,7.0,Summarizing/making notes,Yes,Sometimes,3,Good,Sometimes,No,0.0,"Library, Room",Very Supportive,6.5,3,4
+Male,Bachelor of Computer Science,2,3.5,3,0.5,3.5,Summarizing/making notes,No,,3,Average,Always,Yes,15.5,"Room, Cafe",Neutral,6.5,2,4
+Female,Bachelor of Software Engineering ,1,3.5,5,1.5,3.5,Summarizing/making notes,No,,3,Average,Sometimes,No,0.0,Room,Very Supportive,6.5,2,4
+Female,Bachelor of Biodiversity Management ,1,3.5,4,3.5,7.0,Doing practice questions,Yes,Sometimes,3,Good,Sometimes,No,0.0,"Room, Cafe",Very Supportive,6.5,2,5
+Female,Bachelor of Computer Science ,3,3.5,3,3.5,7.0,Summarizing/making notes,No,,3,Average,Sometimes,No,0.0,Room,Very Supportive,4.5,5,5
+Female,Bachelor of Business,5,3.5,4,3.5,7.0,Summarizing/making notes,Yes,Sometimes,5,Average,Sometimes,Yes,7.5,"Library, Cafe, Campus Study Area",Very Supportive,6.5,1,3
+Female,Bachelor of Game Development,3,3.5,3,1.5,0.5,Watching recorded lectures/videos,No,,4,Average,Always,No,0.0,Room,Very Supportive,6.5,5,5
+Female,Bachelor of Communications ,1,2.5,3,3.5,5.5,Summarizing/making notes,No,,4,Average,Sometimes,No,0.0,"Library, Room",Very Supportive,3.0,3,5
+Female,Bachelor of Digital Media Production ,1,3.5,5,5.5,3.5,Doing practice questions,Yes,Always,2,Good,Sometimes,No,0.0,Room,Very Supportive,4.5,3,1
+Female,Bachelor of Medicine Bachelor of Surgery (MBBS ),2,3.5,6,5.5,7.0,Reading lecture notes,No,,3,Average,Sometimes,No,0.0,"Library, Room",Very Supportive,4.5,2,4
+Female,Bachelor of Arabic Studies and Islamic Civilization,1,3.5,7,5.5,7.0,Summarizing/making notes,Yes,Sometimes,2,Good,Sometimes,No,0.0,"Room, usually at library during study week only",Very Supportive,6.5,2,4
+Female,Bachelor of Communications,3,3.5,3,3.5,5.5,Summarizing/making notes,Yes,Sometimes,3,Good,Sometimes,No,0.0,Room,Very Supportive,4.5,3,5
+Female,Bachelor of Arts,1,3.5,7,5.5,5.5,Summarizing/making notes,No,,2,Good,Sometimes,No,0.0,"Room, Cafe",Very Supportive,6.5,1,5
+Female,Bachelor of Business ,2,3.5,2,1.5,1.5,Ai generated quiz game,No,,4,Average,Sometimes,Yes,7.5,"Library, Room",Neutral,4.5,4,4
+Female,Bachelor of Accounting,1,1.0,1,1.5,0.5,Doing practice questions,No,,5,Average,Never,No,0.0,"Library, Room",Very Not Supportive,4.5,3,3
+Female,Bachelor of Digital Media Production ,1,3.5,1,1.5,7.0,Summarizing/making notes,No,,5,Average,Sometimes,No,0.0,At home ,Very Supportive,4.5,2,5
+Female,Bachelor of Digital Media Production ,1,2.5,4,3.5,5.5,Watching recorded lectures/videos,Yes,Sometimes,3,Average,Sometimes,Yes,15.5,"Library, Room",Neutral,4.5,2,3
+Female,Bachelor of Accounting,1,3.5,3,3.5,1.5,Doing practice questions,Yes,Always,3,Average,Sometimes,No,0.0,"Library, Room, Campus Study Area",Very Supportive,4.5,2,5
+Female,Bachelor of Digital Media Production ,1,3.5,4,0.5,7.0,Summarizing/making notes,No,,4,Average,Sometimes,No,0.0,Room,Very Supportive,6.5,5,5
+Female,Bachelor of Islamic Finance,1,3.5,6,3.5,7.0,Doing practice questions,No,,4,Average,Always,No,0.0,Room,Neutral,4.5,2,4
+Female,Diploma in Halal Industry,1,3.5,5,3.5,3.5,Reading lecture notes,No,,3,Good,Sometimes,No,0.0,"Library, Room",Neutral,8.5,2,5
+Female,Diploma in English Communication,2,3.5,4,5.5,3.5,Summarizing/making notes,Yes,Sometimes,3,Good,Sometimes,No,0.0,"Library, Room, Cafe",Neutral,3.0,3,4
+Female,Diploma in Islamic Finance,2,3.5,3,1.5,5.5,Summarizing/making notes,No,,3,Average,Always,No,0.0,Room,Neutral,6.5,3,3
+Female,Diploma in Islamic Finance,1,3.5,5,5.5,7.0,Doing practice questions,Yes,Always,2,Good,Always,Yes,2.5,Room,Neutral,4.5,5,2
+Female,Diploma in Islamic Finance,2,3.5,2,3.5,5.5,Doing practice questions,No,,3,Good,Never,No,0.0,Room,Very Supportive,6.5,2,5
+Female,Diploma in Islamic Finance,1,3.5,2,1.5,5.5,Summarizing/making notes,No,,4,Average,Always,No,0.0,"Library, Room",Neutral,3.0,4,5
+Female,Bachelor of Physiotherapy,2,3.5,5,3.5,7.0,Doing practice questions,No,,4,Average,Always,No,0.0,Room,Very Supportive,4.5,2,5
+Female,Bachelor of Digital Media Production,1,2.5,5,3.5,5.5,all of the above,No,,4,Average,Always,No,0.0,"Room, Campus Study Area",Neutral,6.5,2,4
+Female,Bachelor of Accounting,2,3.5,7,3.5,7.0,Doing practice questions,Yes,Sometimes,3,Good,Sometimes,No,0.0,Room,Very Supportive,6.5,2,5
