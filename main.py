@@ -155,7 +155,7 @@ with col2:
             <div class="card-meta">
                 <div class="meta-dot teal"></div>
                 <span class="meta-label teal-text">ACADEMIC EXCELLENCE</span>
-                <span class="meta-date">Aug 2025</span>
+                <span class="meta-date">16 Aug 2025</span>
             </div>
             <div class="card-title">
                 From Lorry Driver's Son to Top Scholar: 4.00 GPA Across 6 Semesters
