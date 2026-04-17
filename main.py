@@ -12,6 +12,8 @@ def get_base64(img_path):
 
 news_img = get_base64("images/saysNews.png")
 logo_img = get_base64("images/saysLogo.png")
+kish_img = get_base64("images/kishendrans.png")
+bernama_img = get_base64("images/bernamalogo.png")
 
 st.set_page_config(
     page_title="Study Smart, Not Study Hard",
@@ -30,10 +32,45 @@ def load_css():
 
 load_css()
 
+st.markdown("""
+<style>
+/* Make the second column button teal */
+div[data-testid="column"]:nth-child(2) button {
+    background: linear-gradient(135deg, #0891b2, #0d9488) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 0.6rem 1rem !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    transition: all 0.3s ease !important;
+    width: 100% !important;
+}
+
+div[data-testid="column"]:nth-child(2) button:hover {
+    background: linear-gradient(135deg, #0e7490, #0891b2) !important;
+    box-shadow: 0 6px 14px rgba(8, 145, 178, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Keep first column button red */
+div[data-testid="column"]:first-child button {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+}
+
+div[data-testid="column"]:first-child button:hover {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    box-shadow: 0 6px 14px rgba(220, 38, 38, 0.3) !important;
+}
+</style>
+""", unsafe_allow_html=True)
 # Initialize session state for modal
 if "show_modal" not in st.session_state:
     st.session_state.show_modal = False
 
+if "show_kish_modal" not in st.session_state:
+    st.session_state.show_kish_modal = False
+    
 # Main content container
 st.markdown('<div class="main-content">', unsafe_allow_html=True)
 
@@ -105,40 +142,46 @@ with col1:
         st.session_state.show_modal = True
 
 with col2:
-    st.markdown("""
+    kish_img_style  = f"background-image: url('data:image/png;base64,{kish_img}');" if kish_img else ""
+    bernama_img_tag = f"<img src='data:image/png;base64,{bernama_img}' class='footer-logo'/>" if bernama_img else ""
+    
+    st.markdown(f"""
     <div class="news-card news-card-teal">
-        <div class="card-image featured-bg">
+        <div class="card-image" style="{kish_img_style}">
+            <div class="card-image-gradient"></div>
             <div class="news-tag tag-white">FEATURED</div>
-            <div class="featured-center">
-                <div class="icon-circle">💡</div>
-                <h2 class="featured-title">Success Story</h2>
-                <p class="featured-sub">Evidence-Based Learning</p>
-            </div>
         </div>
         <div class="card-content">
             <div class="card-meta">
                 <div class="meta-dot teal"></div>
-                <span class="meta-label teal-text">SUCCESS STRATEGIES</span>
-                <span class="meta-date">Apr 2026</span>
+                <span class="meta-label teal-text">ACADEMIC EXCELLENCE</span>
+                <span class="meta-date">Aug 2025</span>
             </div>
             <div class="card-title">
-                How This Valedictorian Maintained a 4.0 GPA With Just 4 Hours of Daily Study
+                From Lorry Driver's Son to Top Scholar: 4.00 GPA Across 6 Semesters
             </div>
             <p class="card-text">
-                Through <strong>active recall, spaced repetition, and consistent sleep schedules</strong>, 
-                biochemistry graduate Sarah Chen achieved top honors while maintaining work-life balance. 
-                Her secret: quality over quantity.
+                Malaysian student Kishendran maintained an outstanding <strong>4.00 GPA for six consecutive semesters</strong>. 
+                Despite his humble background, his success was driven by discipline and consistency, frequently 
+                <strong>starting his day as early as 4AM</strong> to manage his academic workload.
             </p>
             <div class="card-footer">
-                <div>
-                    <div class="footer-title">Academic Success Journal</div>
-                    <div class="footer-sub">Research Feature</div>
+                <div class="footer-left">
+                    {bernama_img_tag}
+                    <div>
+                        <div class="footer-title">Bernama</div>
+                        <div class="footer-sub">Student Feature</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
-
+    
+    
+    if st.button("📖 Read Full Story", key="read_kish_story_btn_teal", use_container_width=True):
+        st.session_state.show_kish_modal = True
+    
 # Modal Popup using Streamlit's dialog
 if st.session_state.show_modal:
     with st.expander("## 📰 2 UiTM Students Died Over The Weekend", expanded=True):
@@ -183,6 +226,41 @@ if st.session_state.show_modal:
             st.session_state.show_modal = False
             st.rerun()
 
+
+
+if st.session_state.show_kish_modal:
+    with st.expander("## From Lorry Driver's Son to Top Scholar", expanded=True):
+        st.markdown("### Kishendran achieved a perfect 4.00 GPA across six consecutive semesters")
+
+        st.markdown("""
+        Kishendran's story highlights how strong discipline, consistency, and persistence can lead to academic 
+        excellence. Coming from a humble background, he maintained outstanding academic performance over multiple 
+        semesters.
+
+        His success was not described as last-minute cramming, but rather as sustained effort over time.
+        The story also noted that he would wake up as early as **4AM** to complete assignments and stay on top of 
+        his academic work.
+        """)
+
+        st.markdown("#### Key Success Habits")
+        st.markdown("""
+        - Maintained a **4.00 GPA for six consecutive semesters**
+        - Practiced **strict discipline and time management**
+        - Woke up **as early as 4AM** to stay consistent with academic responsibilities
+        - Stayed committed despite coming from a modest family background
+        """)
+
+        st.markdown("""
+        This story reflects an important idea for this dashboard:
+
+        > Academic success is not just about studying longer, but about studying with discipline, consistency, and purpose.
+        """)
+
+        if st.button("Close", key="close_kish_modal"):
+            st.session_state.show_kish_modal = False
+            st.rerun()
+            
+            
 # Narrative Bridge - Centered with decorative elements
 st.markdown("""
 <div class="narrative-bridge">

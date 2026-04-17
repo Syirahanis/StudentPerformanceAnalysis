@@ -1,11 +1,13 @@
 /* custom.css */
 
-/* Force scroll behavior */
+/* ============================================ */
+/* BASE & LAYOUT                                */
+/* ============================================ */
+
 html {
     scroll-behavior: smooth;
 }
 
-/* MAIN BACKGROUND */
 [data-testid="stAppViewContainer"] {
     background: linear-gradient(
         120deg,
@@ -48,7 +50,17 @@ section[data-testid="stSidebar"] {
     margin-bottom: 0.3rem;
 }
 
-/* REMOVE ALL STREAMLIT AUTO-LINKS FROM HERO TITLE AND CARD TITLES */
+.main .block-container {
+    padding: 0rem 2rem 2rem 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ============================================ */
+/* LINK CLEANUP                                 */
+/* ============================================ */
+
 .hero-title a,
 .hero-title a:link,
 .hero-title a:visited,
@@ -67,14 +79,26 @@ section[data-testid="stSidebar"] {
     cursor: default !important;
 }
 
-/* Remove any link icons or markers */
 .hero-title a::after,
 .card-title a::after {
     display: none !important;
     content: none !important;
 }
 
-/* Hero Section - Centered exactly like reference image */
+.card-title::before,
+.card-title::after,
+.card-title a::before,
+.card-title a::after,
+.hero-title::before,
+.hero-title::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* ============================================ */
+/* HERO SECTION                                 */
+/* ============================================ */
+
 .hero-section {
     text-align: center;
     max-width: 800px;
@@ -100,7 +124,6 @@ section[data-testid="stSidebar"] {
     border: 1px solid rgba(168, 85, 247, 0.2);
 }
 
-/* Hero Title - Fixed for div instead of h1 */
 .hero-title {
     font-size: 2.93rem;
     font-weight: 800;
@@ -137,7 +160,6 @@ section[data-testid="stSidebar"] {
     right: 0;
 }
 
-/* Make sure the subtitle isn't getting extra padding/margin from Streamlit defaults */
 p.hero-subtitle {
     padding-left: 0 !important;
     padding-right: 0 !important;
@@ -162,7 +184,10 @@ p.hero-subtitle {
     margin-right: 0.5rem;
 }
 
-/* News Cards - Side by side */
+/* ============================================ */
+/* NEWS CARDS                                   */
+/* ============================================ */
+
 .news-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -211,19 +236,10 @@ p.hero-subtitle {
     z-index: 10;
 }
 
-.tag-red {
-    background: #dc2626;
-    color: white;
-}
+.tag-red { background: #dc2626; color: white; }
+.tag-white { background: rgba(255,255,255,0.9); color: #0d9488; }
 
-.tag-white {
-    background: rgba(255,255,255,0.9);
-    color: #0d9488;
-}
-
-.card-content {
-    padding: 1.5rem;
-}
+.card-content { padding: 1.5rem; }
 
 .card-meta {
     display: flex;
@@ -253,11 +269,13 @@ p.hero-subtitle {
 
 .meta-dot.red { background: #dc2626; }
 .meta-dot.teal { background: #0d9488; }
-
 .red-text { color: #dc2626; }
 .teal-text { color: #0d9488; }
 
-/* Card Title Styles - No underline, color change on hover */
+/* ============================================ */
+/* CARD TITLE COLORS                            */
+/* ============================================ */
+
 .card-title {
     font-size: 1.4rem;
     font-weight: 800;
@@ -268,7 +286,6 @@ p.hero-subtitle {
     display: block;
 }
 
-/* Card hover colors using specific classes - THESE WILL WORK */
 .news-card-red .card-title,
 .news-card-red .card-title a {
     color: #111827 !important;
@@ -291,16 +308,9 @@ p.hero-subtitle {
     color: #0d9488 !important;
 }
 
-/* Remove any pseudo-elements or link indicators */
-.card-title::before,
-.card-title::after,
-.card-title a::before,
-.card-title a::after,
-.hero-title::before,
-.hero-title::after {
-    display: none !important;
-    content: none !important;
-}
+/* ============================================ */
+/* CARD BODY & FOOTER                           */
+/* ============================================ */
 
 .card-text {
     color: #6b7280;
@@ -309,7 +319,6 @@ p.hero-subtitle {
     margin-bottom: 1rem;
 }
 
-/* Footer */
 .card-footer {
     display: flex;
     justify-content: space-between;
@@ -332,15 +341,8 @@ p.hero-subtitle {
     object-fit: cover;
 }
 
-.footer-title {
-    font-weight: 700;
-    font-size: 0.8rem;
-}
-
-.footer-sub {
-    font-size: 0.7rem;
-    color: #9ca3af;
-}
+.footer-title { font-weight: 700; font-size: 0.8rem; }
+.footer-sub { font-size: 0.7rem; color: #9ca3af; }
 
 .read-link {
     font-size: 0.75rem;
@@ -349,46 +351,45 @@ p.hero-subtitle {
     transition: transform 0.2s ease;
 }
 
-.read-link:hover {
-    transform: translateX(4px);
+.read-link:hover { transform: translateX(4px); }
+
+/* ============================================ */
+/* BUTTONS                                       */
+/* ============================================ */
+
+/* All buttons default to red */
+.stButton button {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 0.6rem 1rem !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    transition: all 0.3s ease !important;
+    width: 100% !important;
 }
 
-/* Feature Card */
-.featured-bg {
-    background: linear-gradient(135deg, #06b6d4, #0d9488);
+.stButton button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 14px rgba(220, 38, 38, 0.3) !important;
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
 }
 
-.featured-center {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white;
+/* Target the specific teal button by its key */
+.stButton button[key="read_kish_story_btn_teal"] {
+    background: linear-gradient(135deg, #0891b2, #0d9488) !important;
 }
 
-.icon-circle {
-    background: rgba(255,255,255,0.2);
-    border-radius: 50%;
-    padding: 1rem;
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
+.stButton button[key="read_kish_story_btn_teal"]:hover {
+    background: linear-gradient(135deg, #0e7490, #0891b2) !important;
+    box-shadow: 0 6px 14px rgba(8, 145, 178, 0.3) !important;
 }
 
-.featured-title {
-    font-size: 1.6rem;
-    font-weight: 800;
-    margin: 0;
-}
+/* ============================================ */
+/* NARRATIVE BRIDGE                             */
+/* ============================================ */
 
-.featured-sub {
-    font-size: 0.9rem;
-    opacity: 0.9;
-    margin: 0;
-}
-
-/* Narrative Bridge - Centered */
 .narrative-bridge {
     max-width: 780px;
     margin: 3rem auto 2rem auto;
@@ -425,7 +426,10 @@ p.hero-subtitle {
     color: transparent;
 }
 
-/* Scroll Indicator - Centered */
+/* ============================================ */
+/* SCROLL INDICATOR                             */
+/* ============================================ */
+
 .scroll-indicator {
     display: flex;
     flex-direction: column;
@@ -457,13 +461,15 @@ p.hero-subtitle {
     50% { transform: rotate(45deg) translateY(6px); }
 }
 
-/* Section spacing */
+/* ============================================ */
+/* SECTION & LAYOUT HELPERS                     */
+/* ============================================ */
+
 .section {
     margin-bottom: 4rem;
     scroll-margin-top: 5rem;
 }
 
-/* Two column layout */
 .two-columns {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -471,48 +477,126 @@ p.hero-subtitle {
     margin-bottom: 2rem;
 }
 
-/* Responsive */
+/* ============================================ */
+/* RESPONSIVE                                   */
+/* ============================================ */
+
 @media (max-width: 900px) {
-    .hero-title {
-        font-size: 2.2rem;
-    }
-    .bridge-question {
-        font-size: 1.3rem;
-    }
-    .bridge-highlight {
-        font-size: 1.4rem;
-    }
-    .news-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-    .two-columns {
-        grid-template-columns: 1fr;
-    }
-    .block-container {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
+    .hero-title { font-size: 2.2rem; }
+    .bridge-question { font-size: 1.3rem; }
+    .bridge-highlight { font-size: 1.4rem; }
+    .news-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+    .two-columns { grid-template-columns: 1fr; }
+    .block-container { padding-left: 1rem; padding-right: 1rem; }
 }
 
 @media (max-width: 768px) {
-    .main .block-container {
-        margin-left: 0;
-        padding: 1rem;
-    }
-    [data-testid="stSidebar"] {
-        display: none;
-    }
+    .main .block-container { margin-left: 0; padding: 1rem; }
+    [data-testid="stSidebar"] { display: none; }
 }
 
-.main .block-container {
-    padding: 0rem 2rem 2rem 2rem;
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
+/* ============================================ */
+/* EXPANDER MODALS                              */
+/* ============================================ */
+
+div[data-testid="stExpander"] {
+    margin-bottom: 1rem !important;
+    background: transparent !important;
 }
 
-/* Button styling for Read Full Story */
+.streamlit-expander {
+    background: transparent !important;
+    border: none !important;
+}
+
+.element-container:has(.streamlit-expander) {
+    background: transparent !important;
+}
+
+div[data-testid="stExpander"] summary p,
+div[data-testid="stExpander"] summary div {
+    color: white !important;
+}
+
+div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] {
+    background-color: white !important;
+    border-radius: 0 0 16px 16px !important;
+    padding: 1.5rem !important;
+    border: 1px solid #e5e7eb !important;
+    border-top: none !important;
+    margin-top: -2px !important;
+}
+
+/* RED expander — 1st */
+div[data-testid="stExpander"]:nth-of-type(1) summary {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    border-radius: 16px !important;
+    padding: 1rem !important;
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    border: none !important;
+}
+
+div[data-testid="stExpander"]:nth-of-type(1) summary:hover {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    transform: translateY(-1px);
+}
+
+/* TEAL expander — 2nd */
+div[data-testid="stExpander"]:nth-of-type(2) summary {
+    background: linear-gradient(135deg, #0891b2, #0d9488) !important;
+    border-radius: 16px !important;
+    padding: 1rem !important;
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    border: none !important;
+}
+
+div[data-testid="stExpander"]:nth-of-type(2) summary:hover {
+    background: linear-gradient(135deg, #0e7490, #0891b2) !important;
+    transform: translateY(-1px);
+}
+
+/* ============================================ */
+/* SCROLLBARS                                   */
+/* ============================================ */
+
+div[data-testid="stExpanderDetails"]::-webkit-scrollbar { width: 8px; }
+
+div[data-testid="stExpanderDetails"]::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+/* RED scrollbar — 1st expander */
+div[data-testid="stExpander"]:nth-of-type(1)
+div[data-testid="stExpanderDetails"]::-webkit-scrollbar-thumb {
+    background: #dc2626;
+    border-radius: 10px;
+}
+div[data-testid="stExpander"]:nth-of-type(1)
+div[data-testid="stExpanderDetails"]::-webkit-scrollbar-thumb:hover {
+    background: #b91c1c;
+}
+
+/* TEAL scrollbar — 2nd expander */
+div[data-testid="stExpander"]:nth-of-type(2)
+div[data-testid="stExpanderDetails"]::-webkit-scrollbar-thumb {
+    background: #0891b2;
+    border-radius: 10px;
+}
+div[data-testid="stExpander"]:nth-of-type(2)
+div[data-testid="stExpanderDetails"]::-webkit-scrollbar-thumb:hover {
+    background: #0d9488;
+}
+
+/* ============================================ */
+/* BUTTONS — SINGLE SOURCE OF TRUTH             */
+/* ============================================ */
+
+/* Default red button for first column */
 .stButton button {
     background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
     color: white !important;
@@ -531,74 +615,16 @@ p.hero-subtitle {
     background: linear-gradient(135deg, #ef4444, #dc2626) !important;
 }
 
-/* ============================================ */
-/* EXPANDER MODAL STYLES - FIXED VERSION */
-/* ============================================ */
-
-/* Expander header - Red gradient background */
-div[data-testid="stExpander"] summary {
-    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
-    border-radius: 16px !important;
-    padding: 1rem !important;
-    color: white !important;
-    font-weight: 700 !important;
-    font-size: 1.1rem !important;
-    border: none !important;
+/* Teal button for second column - more robust selector */
+[data-testid="column"]:nth-of-type(2) .stButton button,
+div:has(> [data-testid="stVerticalBlock"]) [data-testid="column"]:nth-child(2) .stButton button {
+    background: linear-gradient(135deg, #0891b2, #0d9488) !important;
+    box-shadow: none !important;
 }
 
-div[data-testid="stExpander"] summary:hover {
-    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-    transform: translateY(-1px);
-}
-
-/* Expander header text color */
-div[data-testid="stExpander"] summary p,
-div[data-testid="stExpander"] summary div {
-    color: white !important;
-}
-
-/* Expander content area - WHITE BACKGROUND */
-div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] {
-    background-color: white !important;
-    border-radius: 0 0 16px 16px !important;
-    padding: 1.5rem !important;
-    border: 1px solid #e5e7eb !important;
-    border-top: none !important;
-    margin-top: -2px !important;
-}
-
-/* Ensure the expander container has proper styling */
-.streamlit-expander {
-    background: transparent !important;
-    border: none !important;
-}
-
-/* Fix for any default backgrounds */
-.element-container:has(.streamlit-expander) {
-    background: transparent !important;
-}
-
-/* Make the expander stand out as a modal */
-div[data-testid="stExpander"] {
-    margin-bottom: 1rem !important;
-    background: transparent !important;
-}
-
-/* Scrollbar for expander content */
-div[data-testid="stExpanderDetails"]::-webkit-scrollbar {
-    width: 8px;
-}
-
-div[data-testid="stExpanderDetails"]::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-div[data-testid="stExpanderDetails"]::-webkit-scrollbar-thumb {
-    background: #dc2626;
-    border-radius: 10px;
-}
-
-div[data-testid="stExpanderDetails"]::-webkit-scrollbar-thumb:hover {
-    background: #b91c1c;
+[data-testid="column"]:nth-of-type(2) .stButton button:hover,
+div:has(> [data-testid="stVerticalBlock"]) [data-testid="column"]:nth-child(2) .stButton button:hover {
+    background: linear-gradient(135deg, #0e7490, #0891b2) !important;
+    box-shadow: 0 6px 14px rgba(8, 145, 178, 0.3) !important;
+    transform: translateY(-2px) !important;
 }
