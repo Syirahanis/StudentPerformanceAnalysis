@@ -1104,6 +1104,13 @@ def show_core_analysis():
         unsafe_allow_html=True,
     )
 
+    # Center using empty columns (3-column layout with empty side columns)
+    left_empty, center_col, right_empty = st.columns([1, 2, 1])
 
+    with center_col:
+        # Hidden button for navigation trigger
+        if st.button(":material/analytics: Go to Behavioral Insights", key="hidden_nav_btn", 
+                    type="primary", use_container_width=True, help="Navigate to detailed analysis"):
+            st.switch_page("pages/2_behavioral_insights.py")
 if __name__ == "__main__":
     show_core_analysis()
