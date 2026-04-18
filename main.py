@@ -64,20 +64,115 @@ div[data-testid="column"]:first-child button:hover {
 }
 </style>
 """, unsafe_allow_html=True)
-# Initialize session state for modal
-if "show_modal" not in st.session_state:
-    st.session_state.show_modal = False
 
-if "show_kish_modal" not in st.session_state:
-    st.session_state.show_kish_modal = False
+# ==================== DIALOG RENDERERS ====================
+
+def _render_uitm_story_dialog():
+    """Render the UiTM students story content inside a dialog."""
+    st.markdown("### Two students from different Universiti Teknologi MARA (UiTM) campuses died over the weekend")
     
+    st.markdown("""
+    According to Utusan Malaysia(2021), the first case involved **22-year-old Nurul Natasya Ezreen** who passed away on Friday, 9 July, at 2.50pm. She was a UiTM Merbok student, pursuing a diploma in Office Management and Technology, and was receiving treatment at the Sultan Abdul Halim Hospital in Kedah.
+    
+    Meanwhile, Bernama(2021) reported that on Saturday, 10 July, **21-year-old Muhammad Adham Hazim** who was pursuing a diploma in Civil Engineering at the Faculty of Civil Engineering, UiTM Pahang, was confirmed dead at 10.52pm while receiving treatment at the Sultanah Nur Zahirah Hospital in Terengganu.
+    
+    Both of the students died following **ruptured blood vessels in their heads**. Their families noted that prior to their death, they both complained about severe headaches.
+    """)
+    
+    st.markdown("#### Nurul Natasya Ezreen's Story")
+    st.markdown("""
+    **Nurul Natasya Ezreen's** mother, Zuraimi Mohd Desa, told Utusan Malaysia that her daughter would confide in her and her husband over the past six months, letting them know about problems she faced.
+    
+    > "My late daughter did not have any underlying conditions before this, but lately she would complain about a headache due to all the **stress during her studies**," Zuraimi said.
+    
+    After passing out at her rental home, Nurul Natasya Ezreen was rushed to the hospital while **completing her coursework around 3am** on Thursday, 8 July. Her father received a phone call from her housemate regarding the incident and he asked them to call an ambulance.
+    
+    Her family did not get to see her until she passed away the next day.
+    
+    > "The last time we saw her was six months ago when she came back to visit us at home," the father noted.
+    """)
+    
+    st.markdown("#### Muhammad Adham Hazim's Story")
+    st.markdown("""
+    **Muhammad Adham Hazim** was at his family home when he crawled into his parents' room, complaining about a splitting headache. His father, Mohd Rizaini Ghazali, told Bernama that the loss of his second of five children, also fondly known as Abang Ngah among family members, came as a complete shock, as the young man did not suffer from any illness.
+    
+    > "Only a few days ago, he complained of a headache… at about 5am yesterday, Abang Ngah crawled into our room."
+    
+    > "Abang Ngah complained about his splitting headache and asked my wife and me to take him to the hospital. We had to ask for help from neighbours to rush him to the hospital," Mohd Rizaini explained.
+    
+    He said that his son **often slept late to complete assignments and make preparations for the final exam** which was due in two weeks' time.
+    
+    The late Muhammad Adham Hazim was an outstanding student and had also received the **Dean's Award last semester with a cumulative grade point average (CGPA) of 3.89.**
+    > "Abang Ngah is a person who loves to study, and he would divide his time between his studies and running a part-time online business," he said.
+    """)
+
+
+def _render_kishendran_story_dialog():
+    """Render the Kishendran success story content inside a dialog."""
+    st.markdown("### Kishendran achieved a perfect 4.00 GPA across six consecutive semesters")
+
+    st.markdown("""
+    Kishendran's story highlights how strong discipline, consistency, and persistence can lead to academic 
+    excellence. Coming from a humble background, he maintained outstanding academic performance over multiple 
+    semesters.
+
+    His success was not described as last-minute cramming, but rather as sustained effort over time.
+    The story also noted that he would wake up as early as **4AM** to complete assignments and stay on top of 
+    his academic work.
+    """)
+
+    st.markdown("#### Key Success Habits")
+    st.markdown("""
+    - Maintained a **4.00 GPA for six consecutive semesters**
+    - Practiced **strict discipline and time management**
+    - Woke up **as early as 4AM** to stay consistent with academic responsibilities
+    - Stayed committed despite coming from a modest family background
+    """)
+
+    st.markdown("""
+    This story reflects an important idea for this dashboard:
+
+    > Academic success is not just about studying longer, but about studying with discipline, consistency, and purpose.
+    """)
+
+
+# ==================== DIALOG WRAPPERS ====================
+
+def _open_uitm_story_dialog():
+    """Open native Streamlit dialog for UiTM story."""
+    try:
+        @st.dialog("📰 2 UiTM Students Died Over The Weekend", width="large")
+        def _dialog():
+            _render_uitm_story_dialog()
+        _dialog()
+    except AttributeError:
+        # Fallback for older Streamlit versions
+        with st.expander("📰 2 UiTM Students Died Over The Weekend", expanded=True):
+            _render_uitm_story_dialog()
+
+
+def _open_kishendran_story_dialog():
+    """Open native Streamlit dialog for Kishendran story."""
+    try:
+        @st.dialog("🌟 From Lorry Driver's Son to Top Scholar", width="large")
+        def _dialog():
+            _render_kishendran_story_dialog()
+        _dialog()
+    except AttributeError:
+        # Fallback for older Streamlit versions
+        with st.expander("🌟 From Lorry Driver's Son to Top Scholar", expanded=True):
+            _render_kishendran_story_dialog()
+
+
+# ==================== MAIN CONTENT ====================
+
 # Main content container
 st.markdown('<div class="main-content">', unsafe_allow_html=True)
 
 # ==================== INTRODUCTION SECTION ====================
 st.markdown('<div class="section" id="intro">', unsafe_allow_html=True)
 
-# Hero Section - Update the hero-title part
+# Hero Section
 st.markdown("""
 <div class="hero-section">
     <div class="badge">
@@ -129,7 +224,6 @@ with col1:
                     {f"<img src='data:image/png;base64,{logo_img}' class='footer-logo'/>" if logo_img else ""}
                     <div>
                         <div class="footer-title">SAYS</div>
-                        <div class="footer-sub">By Arisha</div>
                     </div>
                 </div>
             </div>
@@ -137,12 +231,8 @@ with col1:
     </div>
     """, unsafe_allow_html=True)
     
-    # Button to trigger modal
-    if st.button("📖 Read Full Story", key="read_story_btn", use_container_width=True):
-        st.session_state.show_modal = True
-
 with col2:
-    kish_img_style  = f"background-image: url('data:image/png;base64,{kish_img}');" if kish_img else ""
+    kish_img_style = f"background-image: url('data:image/png;base64,{kish_img}');" if kish_img else ""
     bernama_img_tag = f"<img src='data:image/png;base64,{bernama_img}' class='footer-logo'/>" if bernama_img else ""
     
     st.markdown(f"""
@@ -169,98 +259,23 @@ with col2:
                 <div class="footer-left">
                     {bernama_img_tag}
                     <div>
-                        <div class="footer-title">Bernama</div>
-                        <div class="footer-sub">Student Feature</div>
+                        <div class="footer-title">BERNAMA</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
-    
-    
-    if st.button("📖 Read Full Story", key="read_kish_story_btn_teal", use_container_width=True):
-        st.session_state.show_kish_modal = True
-    
-# Modal Popup using Streamlit's dialog
-if st.session_state.show_modal:
-    with st.expander("## 📰 2 UiTM Students Died Over The Weekend", expanded=True):
-        st.markdown("### Two students from different Universiti Teknologi MARA (UiTM) campuses died over the weekend")
-        
-        st.markdown("""
-        According to Utusan Malaysia(2021), the first case involved **22-year-old Nurul Natasya Ezreen** who passed away on Friday, 9 July, at 2.50pm. She was a UiTM Merbok student, pursuing a diploma in Office Management and Technology, and was receiving treatment at the Sultan Abdul Halim Hospital in Kedah.
-        
-        Meanwhile, Bernama(2021) reported that on Saturday, 10 July, **21-year-old Muhammad Adham Hazim** who was pursuing a diploma in Civil Engineering at the Faculty of Civil Engineering, UiTM Pahang, was confirmed dead at 10.52pm while receiving treatment at the Sultanah Nur Zahirah Hospital in Terengganu.
-        
-        Both of the students died following **ruptured blood vessels in their heads**. Their families noted that prior to their death, they both complained about severe headaches.
-        """)
-        
-        st.markdown("#### Nurul Natasya Ezreen's Story")
-        st.markdown("""
-        **Nurul Natasya Ezreen's** mother, Zuraimi Mohd Desa, told Utusan Malaysia that her daughter would confide in her and her husband over the past six months, letting them know about problems she faced.
-        
-        > "My late daughter did not have any underlying conditions before this, but lately she would complain about a headache due to all the **stress during her studies**," Zuraimi said.
-        
-        After passing out at her rental home, Nurul Natasya Ezreen was rushed to the hospital while **completing her coursework around 3am** on Thursday, 8 July. Her father received a phone call from her housemate regarding the incident and he asked them to call an ambulance.
-        
-        Her family did not get to see her until she passed away the next day.
-        
-        > "The last time we saw her was six months ago when she came back to visit us at home," the father noted.
-        """)
-        
-        st.markdown("#### Muhammad Adham Hazim's Story")
-        st.markdown("""
-        **Muhammad Adham Hazim** was at his family home when he crawled into his parents' room, complaining about a splitting headache. His father, Mohd Rizaini Ghazali, told Bernama that the loss of his second of five children, also fondly known as Abang Ngah among family members, came as a complete shock, as the young man did not suffer from any illness.
-        
-        > "Only a few days ago, he complained of a headache… at about 5am yesterday, Abang Ngah crawled into our room."
-        
-        > "Abang Ngah complained about his splitting headache and asked my wife and me to take him to the hospital. We had to ask for help from neighbours to rush him to the hospital," Mohd Rizaini explained.
-        
-        He said that his son **often slept late to complete assignments and make preparations for the final exam** which was due in two weeks' time.
-        
-        The late Muhammad Adham Hazim was an outstanding student and had also received the **Dean’s Award last semester with a cumulative grade point average (CGPA) of 3.89.**
-        > "Abang Ngah is a person who loves to study, and he would divide his time between his studies and running a part-time online business," he said.
-        """)
-        
-        if st.button("Close", key="close_modal"):
-            st.session_state.show_modal = False
-            st.rerun()
 
+col1, col2 = st.columns(2)
 
+with col1:
+        if st.button("📖 Read Full Story", key="read_story_btn", use_container_width=True):
+            _open_uitm_story_dialog()
+with col2:
+        if st.button("📖 Read Full Story", key="read_kish_story_btn_teal", use_container_width=True):
+            _open_kishendran_story_dialog()
 
-if st.session_state.show_kish_modal:
-    with st.expander("## From Lorry Driver's Son to Top Scholar", expanded=True):
-        st.markdown("### Kishendran achieved a perfect 4.00 GPA across six consecutive semesters")
-
-        st.markdown("""
-        Kishendran's story highlights how strong discipline, consistency, and persistence can lead to academic 
-        excellence. Coming from a humble background, he maintained outstanding academic performance over multiple 
-        semesters.
-
-        His success was not described as last-minute cramming, but rather as sustained effort over time.
-        The story also noted that he would wake up as early as **4AM** to complete assignments and stay on top of 
-        his academic work.
-        """)
-
-        st.markdown("#### Key Success Habits")
-        st.markdown("""
-        - Maintained a **4.00 GPA for six consecutive semesters**
-        - Practiced **strict discipline and time management**
-        - Woke up **as early as 4AM** to stay consistent with academic responsibilities
-        - Stayed committed despite coming from a modest family background
-        """)
-
-        st.markdown("""
-        This story reflects an important idea for this dashboard:
-
-        > Academic success is not just about studying longer, but about studying with discipline, consistency, and purpose.
-        """)
-
-        if st.button("Close", key="close_kish_modal"):
-            st.session_state.show_kish_modal = False
-            st.rerun()
-            
-            
 # Narrative Bridge - Centered with decorative elements
 st.markdown("""
 <div class="narrative-bridge">

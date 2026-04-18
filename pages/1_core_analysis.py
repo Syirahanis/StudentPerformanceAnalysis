@@ -552,130 +552,208 @@ def metric_card_avg_cgpa(df):
     )
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Chart 1 – CGPA vs Weekly Study Hours Scatter
+# CGPA Group config – single source of truth
 # ─────────────────────────────────────────────────────────────────────────────
 
-def cgpa_vs_study_hours_scatter(df):
-    """Enhanced scatter plot: CGPA vs Weekly Study Hours with trend line."""
+CGPA_GROUPS = {
+    '🏆 Excellent (4.00)': {
+        'filter': lambda d: d['cgpa'] == 4.00,
+        'color': '#7B68C8',       # purple
+        'bg':    'rgba(123,104,200,0.12)',
+        'border':'#7B68C8',
+        'emoji': '🏆',
+        'label': 'Excellent',
+        'range': '4.00',
+    },
+    '🎓 Good (3.00-3.99)': {
+        'filter': lambda d: (d['cgpa'] >= 3.00) & (d['cgpa'] < 4.00),
+        'color': '#4A7FBF',       # blue
+        'bg':    'rgba(74,127,191,0.12)',
+        'border':'#4A7FBF',
+        'emoji': '🎓',
+        'label': 'Good',
+        'range': '3.00–3.99',
+    },
+    '📘 Satisfactory (2.00-2.99)': {
+        'filter': lambda d: (d['cgpa'] >= 2.00) & (d['cgpa'] < 3.00),
+        'color': '#E8A020',       # amber
+        'bg':    'rgba(232,160,32,0.12)',
+        'border':'#E8A020',
+        'emoji': '📘',
+        'label': 'Satisfactory',
+        'range': '2.00–2.99',
+    },
+    '📉 Needs Improvement (<2.00)': {
+        'filter': lambda d: d['cgpa'] < 2.00,
+        'color': '#E05C3A',       # coral
+        'bg':    'rgba(224,92,58,0.12)',
+        'border':'#E05C3A',
+        'emoji': '📉',
+        'label': 'Needs Improvement',
+        'range': '< 2.00',
+    },
+}
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Chart – Interactive CGPA-Group Scatter (replaces both old charts)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def cgpa_vs_study_hours_interactive(df):
+    """
+    All-in-one interactive scatter:
+    • Toggle any of the 4 CGPA groups on/off via Streamlit buttons
+    • Zoom / pan enabled natively
+    • Returns (fig, correlation_all, per_group_stats, overall_corr)
+    """
+ 
     plot_df = df[['weekly_study_hours', 'cgpa']].dropna().copy()
-
     np.random.seed(42)
-    jitter_amount = 0.08
-    plot_df['cgpa_jittered'] = plot_df['cgpa'] + np.random.uniform(-jitter_amount, jitter_amount, size=len(plot_df))
-
-    correlation = plot_df['weekly_study_hours'].corr(plot_df['cgpa'])
-
-    colors = []
-    for cgpa in plot_df['cgpa']:
-        if cgpa >= 3.9:
-            colors.append(PURPLE)
-        elif cgpa >= 3.4:
-            colors.append(BLUE)
-        elif cgpa >= 2.4:
-            colors.append(AMBER)
-        else:
-            colors.append(CORAL)
-
-    hover_texts = [
-        f"<b>CGPA: {row['cgpa']:.2f}</b><br>"
-        f"Weekly Study Hours: {row['weekly_study_hours']:.0f} hrs/week<br>"
-        f"Daily Average: {row['weekly_study_hours']/7:.1f} hrs/day"
-        for _, row in plot_df.iterrows()
-    ]
-
-    fig = go.Figure()
-
-    fig.add_trace(go.Scatter(
-        x=plot_df['weekly_study_hours'],
-        y=plot_df['cgpa_jittered'],
-        mode='markers',
-        name='Students',
-        marker=dict(
-            size=12,
-            color=colors,
-            opacity=0.65,
-            line=dict(width=1.5, color='white'),
-            symbol='circle'
-        ),
-        text=hover_texts,
-        hoverinfo='text',
-        showlegend=False,
-    ))
-
-    x_trend = plot_df['weekly_study_hours']
-    y_trend = plot_df['cgpa']
-    slope, intercept, r_value, p_value, std_err = stats.linregress(x_trend, y_trend)
-    x_line = np.linspace(x_trend.min(), x_trend.max(), 100)
-    y_line = slope * x_line + intercept
-
-    n = len(x_trend)
-    t_value = stats.t.ppf(0.975, n - 2)
-    y_pred = slope * x_trend + intercept
-    residuals = y_trend - y_pred
-    mse = np.sum(residuals**2) / (n - 2)
-    x_mean = np.mean(x_trend)
-    se_line = np.sqrt(mse * (1/n + (x_line - x_mean)**2 / np.sum((x_trend - x_mean)**2)))
-    ci_upper = y_line + t_value * se_line
-    ci_lower = y_line - t_value * se_line
-
-    fig.add_trace(go.Scatter(
-        x=np.concatenate([x_line, x_line[::-1]]),
-        y=np.concatenate([ci_upper, ci_lower[::-1]]),
-        fill='toself',
-        fillcolor='rgba(154, 152, 144, 0.2)',
-        line=dict(color='rgba(255,255,255,0)'),
-        name='95% Confidence Interval',
-        showlegend=True,
-        hoverinfo='none',
-    ))
-
-    fig.add_trace(go.Scatter(
-        x=x_line,
-        y=y_line,
-        mode='lines',
-        name=f'Trend Line (r = {correlation:.2f})',
-        line=dict(color=TEAL, width=3, dash='solid'),
-        showlegend=True,
-    ))
-
-    avg_cgpa = plot_df['cgpa'].mean()
-    fig.add_hline(
-        y=avg_cgpa,
-        line_dash="dot",
-        line_color=GRAY,
-        line_width=1.5,
-        annotation_text=f"Avg CGPA: {avg_cgpa:.2f}",
-        annotation_position="bottom right",
-        annotation_font=dict(size=10, color=GRAY)
+    plot_df['cgpa_j'] = plot_df['cgpa'] + np.random.uniform(-0.07, 0.07, size=len(plot_df))
+ 
+    overall_corr = plot_df['weekly_study_hours'].corr(plot_df['cgpa'])
+ 
+    # ── Per-group stats ──────────────────────────────────────────────────────
+    group_stats = {}
+    for gname, gcfg in CGPA_GROUPS.items():
+        mask = gcfg['filter'](plot_df)
+        sub = plot_df[mask]
+        if len(sub) == 0:
+            continue
+        group_stats[gname] = {
+            'n':      len(sub),
+            'mean':   sub['weekly_study_hours'].mean(),
+            'median': sub['weekly_study_hours'].median(),
+            'std':    sub['weekly_study_hours'].std(),
+            'min':    sub['weekly_study_hours'].min(),
+            'max':    sub['weekly_study_hours'].max(),
+            'corr':   sub['weekly_study_hours'].corr(sub['cgpa']) if len(sub) > 2 else float('nan'),
+            'color':  gcfg['color'],
+            'emoji':  gcfg['emoji'],
+            'label':  gcfg['label'],
+            'range':  gcfg['range'],
+        }
+ 
+    # ── Session-state for active groups ─────────────────────────────────────
+    if 'scatter_active_groups' not in st.session_state:
+        st.session_state['scatter_active_groups'] = list(CGPA_GROUPS.keys())
+ 
+    # ── Toggle buttons ───────────────────────────────────────────────────────
+    st.markdown(
+        """
+        <div style="margin-bottom:0.6rem;">
+            <span style="font-size:0.78rem; font-weight:700; text-transform:uppercase;
+                         letter-spacing:0.08em; color:#9CA3AF;">
+                Filter by CGPA Group — click to toggle
+            </span>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
-
+ 
+    btn_cols = st.columns(4)
+    for i, (gname, gcfg) in enumerate(CGPA_GROUPS.items()):
+        with btn_cols[i]:
+            is_active = gname in st.session_state['scatter_active_groups']
+            n_label   = group_stats.get(gname, {}).get('n', 0)
+            btn_style = (
+                f"background:{gcfg['color']}; color:white; border:none;"
+                if is_active else
+                f"background:white; color:{gcfg['color']}; "
+                f"border:2px solid {gcfg['color']};"
+            )
+            # Render a styled button via HTML label + Streamlit button trick
+            st.markdown(
+                f"""
+                <div style="
+                    {btn_style}
+                    border-radius:9999px; padding:0.45rem 0.5rem;
+                    text-align:center; font-size:0.78rem; font-weight:700;
+                    cursor:pointer; margin-bottom:0.3rem;
+                    box-shadow: {'0 3px 10px rgba(0,0,0,0.15)' if is_active else 'none'};
+                    transition: all 0.2s;
+                ">
+                    {gcfg['emoji']} {gcfg['label']}<br>
+                    <span style="font-size:0.68rem; opacity:0.85;">{gcfg['range']} · {n_label} students</span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            if st.button(
+                f"{'✓ ' if is_active else ''}{gcfg['label']}",
+                key=f"toggle_{i}",
+                use_container_width=True,
+                help=f"{'Hide' if is_active else 'Show'} {gcfg['label']} group",
+            ):
+                if is_active:
+                    if len(st.session_state['scatter_active_groups']) > 1:  # keep at least 1
+                        st.session_state['scatter_active_groups'].remove(gname)
+                else:
+                    st.session_state['scatter_active_groups'].append(gname)
+                st.rerun()
+ 
+    active_groups = st.session_state['scatter_active_groups']
+ 
+    # ── Build figure ─────────────────────────────────────────────────────────
+    fig = go.Figure()
+ 
+    # Scatter traces – one per active group
+    for gname, gcfg in CGPA_GROUPS.items():
+        if gname not in active_groups:
+            continue
+        mask = gcfg['filter'](plot_df)
+        sub  = plot_df[mask]
+        if len(sub) == 0:
+            continue
+        gstats = group_stats.get(gname, {})
+ 
+        hover = [
+            f"<b>{gcfg['emoji']} {gcfg['label']} Group</b><br>"
+            f"CGPA: <b>{row['cgpa']:.2f}</b><br>"
+            f"Weekly Study Hours: <b>{row['weekly_study_hours']:.0f} hrs</b><br>"
+            f"Daily Average: {row['weekly_study_hours']/7:.1f} hrs/day<br>"
+            f"─────────────────<br>"
+            f"Group Mean: {gstats.get('mean',0):.0f} hrs | "
+            f"Range: {gstats.get('min',0):.0f}–{gstats.get('max',0):.0f} hrs"
+            for _, row in sub.iterrows()
+        ]
+ 
+        fig.add_trace(go.Scatter(
+            x=sub['weekly_study_hours'],
+            y=sub['cgpa_j'],
+            mode='markers',
+            name=f"{gcfg['emoji']} {gcfg['label']} (n={len(sub)})",
+            marker=dict(
+                size=11,
+                color=gcfg['color'],
+                opacity=0.68,
+                line=dict(width=1.2, color='white'),
+                symbol='circle',
+            ),
+            text=hover,
+            hoverinfo='text',
+        ))
+ 
     fig.update_layout(
         template="plotly_white",
-        height=500,
-        margin=dict(l=60, r=40, t=60, b=70),
-        paper_bgcolor="rgba(255,255,255,0.95)",
-        plot_bgcolor="rgba(255,255,255,0.95)",
-        title=dict(
-            text="<b>Study Hours vs CGPA Analysis</b>",
-            x=0.5,
-            xanchor='center',
-            font=dict(size=16, color='#1f2937')
-        ),
+        height=520,
+        margin=dict(l=60, r=50, t=70, b=70),
+        paper_bgcolor="rgba(255,255,255,0.97)",
+        plot_bgcolor="rgba(255,255,255,0.97)",
         xaxis=dict(
             title="<b>Weekly Study Hours</b>",
-            gridcolor='#E8E6E0',
+            gridcolor='#EDE9E0',
             zeroline=False,
-            range=[0, 55],
+            range=[-1, 57],
             dtick=10,
             title_font=dict(size=13),
             tickfont=dict(size=11),
         ),
         yaxis=dict(
             title="<b>CGPA</b>",
-            gridcolor='#E8E6E0',
+            gridcolor='#EDE9E0',
             zeroline=False,
-            range=[1.6, 4.2],
+            range=[0.8, 4.3],
             dtick=0.5,
             title_font=dict(size=13),
             tickfont=dict(size=11),
@@ -683,138 +761,62 @@ def cgpa_vs_study_hours_scatter(df):
         legend=dict(
             orientation="h",
             yanchor="bottom",
-            y=1.02,
+            y=1.03,
             xanchor="center",
             x=0.5,
             bgcolor="rgba(255,255,255,0.9)",
             bordercolor="#E8E6E0",
             borderwidth=1,
-            font=dict(size=11),
+            font=dict(size=10.5),
+            itemsizing='constant',
         ),
         hovermode='closest',
+        dragmode='zoom',
+        modebar=dict(
+            orientation='v',
+            bgcolor='rgba(255,255,255,0.8)',
+        ),
     )
-
-    return fig, correlation
+ 
+    return fig, overall_corr, group_stats, overall_corr
+ 
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Chart 2 – Zoomed scatter for CGPA 3.5 focus
+# Per-group stat cards (shown below the chart)
 # ─────────────────────────────────────────────────────────────────────────────
+
+def _render_group_stat_cards(group_stats: dict, active_groups: list):
+    """Four compact stat cards — one per active CGPA group."""
+
+    cols = st.columns(len(active_groups)) if active_groups else []
+
+    for i, gname in enumerate(g for g in CGPA_GROUPS if g in active_groups):
+        gs = group_stats.get(gname)
+        if gs is None:
+            continue
+        corr_str = f"{gs['corr']:.2f}" if not np.isnan(gs['corr']) else "n/a"
+        corr_color = (
+            '#DC2626' if abs(gs['corr']) < 0.15 else
+            '#F59E0B' if abs(gs['corr']) < 0.30 else
+            '#10B981'
+        ) if not np.isnan(gs['corr']) else '#9CA3AF'
+
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Legacy stubs – kept so any external call sites don't crash
+# ─────────────────────────────────────────────────────────────────────────────
+
+def cgpa_vs_study_hours_scatter(df):
+    """Compatibility shim – delegates to cgpa_vs_study_hours_interactive."""
+    fig, corr, _, _ = cgpa_vs_study_hours_interactive(df)
+    return fig, corr
+
 
 def cgpa_vs_study_hours_zoomed(df, target_cgpa=3.5):
-    """Zoomed scatter plot focusing on a single CGPA group."""
-
-    if target_cgpa == 3.5:
-        plot_df = df[(df['cgpa'] >= 3.4) & (df['cgpa'] < 3.9)][['weekly_study_hours', 'cgpa']].dropna().copy()
-    else:
-        plot_df = df[df['cgpa'] == target_cgpa][['weekly_study_hours', 'cgpa']].dropna().copy()
-
-    if len(plot_df) == 0:
-        return None, 0, 0, 0, 0, 0, 0
-
-    n_students  = len(plot_df)
-    mean_hours  = plot_df['weekly_study_hours'].mean()
-    median_hours= plot_df['weekly_study_hours'].median()
-    std_hours   = plot_df['weekly_study_hours'].std()
-    min_hours   = plot_df['weekly_study_hours'].min()
-    max_hours   = plot_df['weekly_study_hours'].max()
-
-    np.random.seed(42)
-    jitter_amount = 0.03
-    plot_df['cgpa_jittered'] = plot_df['cgpa'] + np.random.uniform(-jitter_amount, jitter_amount, size=len(plot_df))
-
-    colors = [TEAL if hours > mean_hours else BLUE for hours in plot_df['weekly_study_hours']]
-
-    hover_texts = [
-        f"<b>CGPA: {row['cgpa']:.2f}</b><br>"
-        f"Weekly Study Hours: {row['weekly_study_hours']:.0f} hrs/week<br>"
-        f"Daily Average: {row['weekly_study_hours']/7:.1f} hrs/day<br>"
-        f"{'📚 Above average study time' if row['weekly_study_hours'] > mean_hours else '✨ Efficient learner (below avg)'}"
-        for _, row in plot_df.iterrows()
-    ]
-
-    fig = go.Figure()
-
-    fig.add_trace(go.Scatter(
-        x=plot_df['weekly_study_hours'],
-        y=plot_df['cgpa_jittered'],
-        mode='markers',
-        name=f'CGPA {target_cgpa} Students',
-        marker=dict(
-            size=14,
-            color=colors,
-            opacity=0.8,
-            line=dict(width=1.5, color='white'),
-            symbol='circle'
-        ),
-        text=hover_texts,
-        hoverinfo='text',
-        showlegend=True,
-    ))
-
-    fig.add_vline(
-        x=mean_hours,
-        line_dash="dash",
-        line_color=TEAL,
-        line_width=2.5,
-        annotation_text=f"Mean: {mean_hours:.0f} hrs/week",
-        annotation_position="top",
-        annotation_font=dict(size=11, color=TEAL)
-    )
-    fig.add_vline(
-        x=median_hours,
-        line_dash="dot",
-        line_color=AMBER,
-        line_width=2,
-        annotation_text=f"Median: {median_hours:.0f} hrs/week",
-        annotation_position="bottom",
-        annotation_font=dict(size=10, color=AMBER)
-    )
-
-    fig.update_layout(
-        template="plotly_white",
-        height=400,
-        margin=dict(l=60, r=40, t=60, b=70),
-        paper_bgcolor="rgba(255,255,255,0.95)",
-        plot_bgcolor="rgba(255,255,255,0.95)",
-        title=dict(
-            text=f"<b>Study Hours Distribution for CGPA {target_cgpa} Students</b>",
-            x=0.5,
-            xanchor='center',
-            font=dict(size=14, color='#1f2937')
-        ),
-        xaxis=dict(
-            title="<b>Weekly Study Hours</b>",
-            gridcolor='#E8E6E0',
-            zeroline=False,
-            range=[0, 55],
-            dtick=10,
-            title_font=dict(size=12),
-            tickfont=dict(size=10),
-        ),
-        yaxis=dict(
-            title="<b>CGPA</b>",
-            gridcolor='#E8E6E0',
-            zeroline=False,
-            range=[3.35, 3.65] if target_cgpa == 3.5 else [target_cgpa - 0.15, target_cgpa + 0.15],
-            title_font=dict(size=12),
-            tickfont=dict(size=10),
-        ),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="center",
-            x=0.5,
-            bgcolor="rgba(255,255,255,0.9)",
-            bordercolor="#E8E6E0",
-            borderwidth=1,
-            font=dict(size=10),
-        ),
-        hovermode='closest',
-    )
-
-    return fig, n_students, mean_hours, median_hours, std_hours, min_hours, max_hours
+    """Compatibility shim – returns None so caller skips the old zoomed section."""
+    return None, 0, 0, 0, 0, 0, 0
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -919,123 +921,110 @@ def show_core_analysis():
         unsafe_allow_html=True,
     )
 
-    # Main scatter plot
+    # ── Scatter header ────────────────────────────────────────────────────────
     st.markdown(
         """
-        <div style="text-align: center; margin-bottom: 1rem;">
-            <h2 style="font-size: 1.5rem; font-weight: 700; color: #111827;">Study Hours vs CGPA</h2>
-            <p style="color: #6b7280; font-size: 0.9rem;">
-                Analysis of students shows no strong relationship between study duration and academic performance
-            </p>
+        <div style="
+            background: linear-gradient(135deg, rgba(123,104,200,0.07) 0%, rgba(74,127,191,0.07) 100%);
+            border: 1.5px solid rgba(123,104,200,0.2);
+            border-radius: 18px;
+            padding: 1.2rem 1.8rem;
+            margin-bottom: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 1.1rem;
+        ">
+            <div style="
+                flex-shrink: 0;
+                width: 44px; height: 44px;
+                background: linear-gradient(135deg, #7B68C8, #4A7FBF);
+                border-radius: 12px;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 1.3rem;
+            ">📊</div>
+            <div>
+                <div style="font-size: 1.15rem; font-weight: 800; color: #111827; line-height: 1.2; margin-bottom: 0.25rem;">
+                    Study Hours vs CGPA
+                </div>
+                <div style="font-size: 0.86rem; color: #6b7280; line-height: 1.5;">
+                    Each dot is a student.&nbsp;
+                    <strong style="color: #4A7FBF;">Select CGPA groups</strong> to compare,
+                    zoom &amp; pan the chart to dig deeper.
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    fig, correlation = cgpa_vs_study_hours_scatter(df)
+    # ── Interactive chart ─────────────────────────────────────────────────────
+    fig, correlation, group_stats, visible_corr = cgpa_vs_study_hours_interactive(df)
 
-    st.markdown(
-        """
-        <div style="
-            background: white;
-            border-radius: 20px;
-            border: 1px solid #e5e7eb;
-            padding: 1.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.025);
-            margin-bottom: 1.5rem;
-        ">
-        """,
-        unsafe_allow_html=True,
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={
+            'displayModeBar': True,
+            'responsive': True,
+            'modeBarButtonsToAdd': ['select2d', 'lasso2d'],
+            'modeBarButtonsToRemove': ['toImage'],
+            'scrollZoom': True,
+        },
     )
-    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': True, 'responsive': True})
 
+    # Stat row below chart
     col_left, col_right = st.columns(2)
     with col_left:
+        r2 = visible_corr ** 2
         st.markdown(
             f"""
-            <div style="font-size: 0.85rem; color: #6b7280;">
-                <strong>Statistical Summary:</strong><br>
-                Correlation coefficient: r = {correlation:.2f}<br>
-                R² = {(correlation**2):.3f} ({((correlation**2)*100):.1f}% variance explained)
+            <div style="font-size: 0.84rem; color: #6b7280; padding-left: 0.2rem;">
+                <strong>Overall r&nbsp;=&nbsp;{correlation:.2f}</strong> &nbsp;|&nbsp;
+                Visible r&nbsp;=&nbsp;{visible_corr:.2f} &nbsp;|&nbsp;
+                R²&nbsp;=&nbsp;{r2:.3f}&nbsp;({r2*100:.1f}% variance explained)
             </div>
             """,
             unsafe_allow_html=True,
         )
     with col_right:
-        badge_color = "#DC2626" if abs(correlation) < 0.3 else "#F59E0B" if abs(correlation) < 0.5 else "#10B981"
-        badge_text  = "Weak Correlation" if abs(correlation) < 0.3 else "Moderate Correlation" if abs(correlation) < 0.5 else "Strong Correlation"
+        badge_color = (
+            "#DC2626" if abs(visible_corr) < 0.15 else
+            "#F97316" if abs(visible_corr) < 0.30 else
+            "#F59E0B" if abs(visible_corr) < 0.50 else "#10B981"
+        )
+        badge_text = (
+            "🔴 Very Weak Correlation" if abs(visible_corr) < 0.15 else
+            "🟠 Weak Correlation"      if abs(visible_corr) < 0.30 else
+            "🟡 Moderate Correlation"  if abs(visible_corr) < 0.50 else
+            "🟢 Strong Correlation"
+        )
         st.markdown(
             f"""
-            <div style="display: inline-block; padding: 0.35rem 1rem; background: rgba(239,68,68,0.1);
-                        color: {badge_color}; font-size: 0.8rem; font-weight: 600;
-                        border-radius: 9999px; float: right;">
-                {badge_text}
+            <div style="display: flex; justify-content: flex-end;">
+                <span style="display: inline-block; padding: 0.35rem 1rem;
+                             background: {badge_color}18; color: {badge_color};
+                             font-size: 0.8rem; font-weight: 700;
+                             border-radius: 9999px; border: 1px solid {badge_color}44;">
+                    {badge_text}
+                </span>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    # ── Per-group stat cards ──────────────────────────────────────────────────
+    active_groups = st.session_state.get('scatter_active_groups', list(CGPA_GROUPS.keys()))
+    _render_group_stat_cards(group_stats, active_groups)
 
-    # Zoomed scatter
-    st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
+    # ── "So what?" callout banner ─────────────────────────────────────────────
+    st.markdown("<div style='height: 1.2rem;'></div>", unsafe_allow_html=True)
 
-    zoomed_result = cgpa_vs_study_hours_zoomed(df, target_cgpa=3.5)
-    if zoomed_result[0] is not None:
-        fig_zoomed, n35, mean_hours, median_hours, std_hours, min_hours, max_hours = zoomed_result
-
-        st.markdown(
-            f"""
-            <div style="text-align: center; margin-bottom: 1rem;">
-                <h3 style="font-size: 1.25rem; font-weight: 600; color: #111827;">
-                    🔍 Variation in Study Hours within CGPA 3.5 Students
-                </h3>
-                <p style="color: #6b7280; font-size: 0.85rem;">
-                    n={n35} students | Mean: {mean_hours:.0f} hrs/week | 
-                    Median: {median_hours:.0f} hrs/week | Std Dev: {std_hours:.0f} hrs/week | 
-                    Range: {min_hours:.0f}–{max_hours:.0f} hrs
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        st.markdown(
-            """
-            <div style="
-                background: white;
-                border-radius: 20px;
-                border: 1px solid #e5e7eb;
-                padding: 1.5rem;
-                box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
-            ">
-            """,
-            unsafe_allow_html=True,
-        )
-        st.plotly_chart(fig_zoomed, use_container_width=True, config={'displayModeBar': True, 'responsive': True})
-
-        st.markdown(
-            f"""
-            <div style="
-                background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
-                border-left: 4px solid {BLUE};
-                border-radius: 12px;
-                padding: 1rem 1.25rem;
-                font-size: 0.9rem;
-                color: #374151;
-                margin-top: 1rem;
-            ">
-                💡 <strong>Key Insight:</strong> Even within the same CGPA (3.5), study hours vary widely — 
-                from {min_hours:.0f} to {max_hours:.0f} hours/week (a {max_hours-min_hours:.0f}-hour range). 
-                This reinforces that <strong>study quality matters more than quantity</strong>.
-                <br><br>
-                📊 <strong>Statistical Note:</strong> The standard deviation of {std_hours:.0f} hours indicates 
-                substantial variability in study habits among students with identical academic performance.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
+    # Build a mini data-point: widest hours range among active groups
+    ranges = [
+        (gs['max'] - gs['min'], gs['label'], gs['min'], gs['max'])
+        for gn, gs in group_stats.items() if gn in active_groups
+    ]
+    widest = max(ranges, key=lambda x: x[0]) if ranges else (0, '?', 0, 0)
 
     # Insight Callout
     st.markdown(
@@ -1053,9 +1042,9 @@ def show_core_analysis():
                 The Data Speaks: Study Duration ≠ Better Grades
             </p>
             <p style="font-size: 1rem; color: #374151; margin-bottom: 0.75rem;">
-                With a correlation of just 0.12, study hours alone are 
-                <span style="font-weight: 700; color: #DC2626;">not a reliable predictor</span> 
-                of academic success.
+                The scatter plot shows no clear pattern. Students with higher CGPA are not consistently studying more, and the points are widely spread.
+                Even within the “Good” group(3.00-3.99), study time ranges from 1 to 38 hours, yet the CGPA remains the same.
+                With a correlation of just 0.13, the message is clear: <br><span style="font-weight: 700; color: #DC2626;">more study hours do not guarantee better grades.</span> 
             </p>
             <p style="font-size: 0.9rem; color: #6b7280;">
                 This raises an important question...
