@@ -1,6 +1,6 @@
-/* custom.css - Enhanced with better modal and chart styling */
+/* core.css – Enhanced for Streamlit native dialog + detail tables */
 
-/* MAIN BACKGROUND */
+/* ── MAIN BACKGROUND ──────────────────────────────────────────────────────── */
 [data-testid="stAppViewContainer"] {
     background: linear-gradient(
         120deg,
@@ -11,13 +11,8 @@
         #e0f2fe 100%
     ) !important;
 }
-.main {
-    background: transparent !important;
-}
-
-header {
-    background: transparent !important;
-}
+.main          { background: transparent !important; }
+header         { background: transparent !important; }
 
 [data-testid="stSidebar"] {
     background: rgba(255, 255, 255, 0.6);
@@ -35,6 +30,49 @@ section[data-testid="stSidebar"] {
     border-right: 1px solid #ececec;
 }
 
+/* ── STREAMLIT NATIVE DIALOG (st.dialog) ─────────────────────────────────── */
+/* The dialog is rendered inside a Streamlit-managed overlay — these rules
+   polish the interior content area without fighting Streamlit's own overlay. */
+
+[data-testid="stDialog"] [data-testid="stVerticalBlock"] {
+    padding: 0.25rem 0;
+}
+
+/* Make dataframes inside the dialog blend in */
+[data-testid="stDialog"] [data-testid="stDataFrame"] {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+/* Dividers inside dialog */
+[data-testid="stDialog"] hr {
+    border-color: #e5e7eb;
+    margin: 1rem 0;
+}
+
+/* ── "VIEW DETAILS" BUTTON ───────────────────────────────────────────────── */
+/* Targets the secondary button placed below the Total Students card */
+div[data-testid="stButton"] > button[kind="secondary"] {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(203, 213, 225, 0.6);
+    border-radius: 9999px;
+    color: #374151;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0.4rem 1.1rem;
+    transition: all 0.18s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+div[data-testid="stButton"] > button[kind="secondary"]:hover {
+    background: white;
+    border-color: #a5b4fc;
+    color: #4f46e5;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+    transform: translateY(-1px);
+}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────────────────── */
 .sidebar-brand h2 {
     font-size: 1.15rem;
     font-weight: 800;
@@ -42,6 +80,7 @@ section[data-testid="stSidebar"] {
     margin-bottom: 0.3rem;
 }
 
+/* ── INTRO PAGE ──────────────────────────────────────────────────────────── */
 .intro-page {
     text-align: center;
     padding-top: 2.5rem;
@@ -72,13 +111,8 @@ section[data-testid="stSidebar"] {
     min-height: 410px;
 }
 
-.pressure-card {
-    border-top: 5px solid #f97316;
-}
-
-.smart-card {
-    border-top: 5px solid #22c7f0;
-}
+.pressure-card { border-top: 5px solid #f97316; }
+.smart-card    { border-top: 5px solid #22c7f0; }
 
 .story-tag {
     display: inline-block;
@@ -88,16 +122,8 @@ section[data-testid="stSidebar"] {
     font-weight: 700;
     margin-bottom: 0.9rem;
 }
-
-.pressure-tag {
-    background: #ffe4e6;
-    color: #ef4444;
-}
-
-.smart-tag {
-    background: #dff8fb;
-    color: #0891b2;
-}
+.pressure-tag { background: #ffe4e6; color: #ef4444; }
+.smart-tag    { background: #dff8fb; color: #0891b2; }
 
 .story-image-placeholder {
     width: 100%;
@@ -147,15 +173,11 @@ section[data-testid="stSidebar"] {
 }
 
 @media (max-width: 900px) {
-    .intro-title {
-        font-size: 2.2rem;
-    }
-
-    .story-title {
-        font-size: 1.25rem;
-    }
+    .intro-title  { font-size: 2.2rem; }
+    .story-title  { font-size: 1.25rem; }
 }
 
+/* ── PAGE TYPOGRAPHY ─────────────────────────────────────────────────────── */
 .page-title {
     font-size: 2.6rem;
     font-weight: 800;
@@ -178,6 +200,7 @@ section[data-testid="stSidebar"] {
     margin-bottom: 1.6rem;
 }
 
+/* ── SECTION TAGS ────────────────────────────────────────────────────────── */
 .section-tag {
     display: inline-block;
     padding: 0.34rem 0.85rem;
@@ -186,17 +209,10 @@ section[data-testid="stSidebar"] {
     font-weight: 700;
     margin-bottom: 0.8rem;
 }
+.stress-tag  { background: #ffe4e6; color: #e25353; }
+.habits-tag  { background: #d7faf0; color: #17a38b; }
 
-.stress-tag {
-    background: #ffe4e6;
-    color: #e25353;
-}
-
-.habits-tag {
-    background: #d7faf0;
-    color: #17a38b;
-}
-
+/* ── SECTION DIVIDER ─────────────────────────────────────────────────────── */
 .section-divider {
     display: flex;
     align-items: center;
@@ -205,22 +221,16 @@ section[data-testid="stSidebar"] {
     font-size: 0.88rem;
     margin: 1.8rem 0 2rem;
 }
-
 .section-divider::before,
 .section-divider::after {
     content: "";
     flex: 1;
     border-bottom: 1px solid #e5e7eb;
 }
+.section-divider::before { margin-right: 14px; }
+.section-divider::after  { margin-left:  14px; }
 
-.section-divider::before {
-    margin-right: 14px;
-}
-
-.section-divider::after {
-    margin-left: 14px;
-}
-
+/* ── HIGHLIGHT BANNER ────────────────────────────────────────────────────── */
 .highlight-banner {
     background: rgba(255, 255, 255, 0.8);
     border: 2px solid #c084fc;
@@ -230,20 +240,15 @@ section[data-testid="stSidebar"] {
     margin-top: 1rem;
     box-shadow: 0 8px 24px rgba(36, 37, 38, 0.06);
 }
-
 .highlight-banner h3 {
     font-size: 1.55rem;
     color: #111827;
     margin-bottom: 0.4rem;
     font-weight: 800;
 }
+.highlight-banner p { color: #6b7280; font-size: 0.98rem; margin: 0; }
 
-.highlight-banner p {
-    color: #6b7280;
-    font-size: 0.98rem;
-    margin: 0;
-}
-
+/* ── INSIGHT BOX ─────────────────────────────────────────────────────────── */
 .insight-box {
     background: rgba(255, 255, 255, 0.76);
     border-radius: 18px;
@@ -255,46 +260,16 @@ section[data-testid="stSidebar"] {
     align-items: flex-start;
     border-left: 5px solid #9333ea;
 }
+.insight-icon { font-size: 1.2rem; line-height: 1.2; color: #6b7280; margin-top: 0.1rem; }
+.insight-content h3 { font-size: 1.14rem; color: #111827; margin-bottom: 0.35rem; font-weight: 800; }
+.insight-content p  { color: #4b5563; font-size: 0.95rem; margin: 0; }
 
-.insight-icon {
-    font-size: 1.2rem;
-    line-height: 1.2;
-    color: #6b7280;
-    margin-top: 0.1rem;
-}
+.purple-left { border-left-color: #a855f7; }
+.cyan-left   { border-left-color: #22c7f0; background: rgba(226, 250, 252, 0.82); }
+.pink-left   { border-left-color: #ec4899; background: rgba(253, 242, 248, 0.82); }
+.red-left    { border-left-color: #ef4444; background: rgba(254, 242, 242, 0.82); }
 
-.insight-content h3 {
-    font-size: 1.14rem;
-    color: #111827;
-    margin-bottom: 0.35rem;
-    font-weight: 800;
-}
-
-.insight-content p {
-    color: #4b5563;
-    font-size: 0.95rem;
-    margin: 0;
-}
-
-.purple-left {
-    border-left-color: #a855f7;
-}
-
-.cyan-left {
-    border-left-color: #22c7f0;
-    background: rgba(226, 250, 252, 0.82);
-}
-
-.pink-left {
-    border-left-color: #ec4899;
-    background: rgba(253, 242, 248, 0.82);
-}
-
-.red-left {
-    border-left-color: #ef4444;
-    background: rgba(254, 242, 242, 0.82);
-}
-
+/* ── RECOMMENDATION CARD ─────────────────────────────────────────────────── */
 .recommendation-card {
     background: rgba(255, 255, 255, 0.84);
     border-radius: 18px;
@@ -304,7 +279,6 @@ section[data-testid="stSidebar"] {
     box-shadow: 0 8px 22px rgba(36, 37, 38, 0.06);
     border: 1px solid rgba(236, 236, 236, 0.9);
 }
-
 .recommendation-icon {
     width: 42px;
     height: 42px;
@@ -318,20 +292,10 @@ section[data-testid="stSidebar"] {
     font-size: 1.1rem;
     font-weight: 700;
 }
+.recommendation-card h4 { font-size: 1.16rem; color: #111827; margin-bottom: 0.45rem; font-weight: 800; }
+.recommendation-card p  { color: #6b7280; font-size: 0.94rem; margin: 0; }
 
-.recommendation-card h4 {
-    font-size: 1.16rem;
-    color: #111827;
-    margin-bottom: 0.45rem;
-    font-weight: 800;
-}
-
-.recommendation-card p {
-    color: #6b7280;
-    font-size: 0.94rem;
-    margin: 0;
-}
-
+/* ── QUOTE BOX ───────────────────────────────────────────────────────────── */
 .quote-box {
     background: rgba(255, 255, 255, 0.78);
     border-radius: 22px;
@@ -344,120 +308,26 @@ section[data-testid="stSidebar"] {
     box-shadow: 0 10px 26px rgba(36, 37, 38, 0.07);
 }
 
-/* Enhanced Plotly Chart Styling */
+/* ── PLOTLY CHART CONTAINER ──────────────────────────────────────────────── */
 div[data-testid="stPlotlyChart"] {
     background: transparent !important;
     border-radius: 20px;
     margin-bottom: 0.6rem;
 }
 
-/* Modal styling for better visibility */
-.modal-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(8px);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+/* ── CHART CARD HEADERS ──────────────────────────────────────────────────── */
+.chart-card-header          { margin-bottom: 0.7rem; }
+.chart-card-header h3       { font-size: 1.08rem; font-weight: 800; color: #1f2937; margin-bottom: 0.28rem; }
+.chart-card-header p        { font-size: 0.92rem; color: #6b7280; margin-bottom: 0.7rem; }
+.chart-kicker               { font-size: 0.76rem; color: #9ca3af; font-style: italic; margin-bottom: 0.4rem; }
+.chart-note                 { font-size: 0.82rem; color: #7c8594; margin-top: 0.2rem; padding-left: 0.1rem; padding-bottom: 0.2rem; }
 
-.modal-content {
-    background: white;
-    border-radius: 32px;
-    max-width: 600px;
-    width: 90%;
-    max-height: 85vh;
-    overflow-y: auto;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-    animation: slideUp 0.3s ease-out;
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
+/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
-    .page-title {
-        font-size: 2rem;
-    }
-
-    .subpage-title {
-        font-size: 1.7rem;
-    }
-
-    .quote-box {
-        font-size: 1.3rem;
-    }
+    .page-title    { font-size: 2rem; }
+    .subpage-title { font-size: 1.7rem; }
+    .quote-box     { font-size: 1.3rem; }
 }
 
-.chart-card-header {
-    margin-bottom: 0.7rem;
-}
-
-.chart-card-header h3 {
-    font-size: 1.08rem;
-    font-weight: 800;
-    color: #1f2937;
-    margin-bottom: 0.28rem;
-}
-
-.chart-card-header p {
-    font-size: 0.92rem;
-    color: #6b7280;
-    margin-bottom: 0.7rem;
-}
-
-.chart-kicker {
-    font-size: 0.76rem;
-    color: #9ca3af;
-    font-style: italic;
-    margin-bottom: 0.4rem;
-}
-
-.chart-note {
-    font-size: 0.82rem;
-    color: #7c8594;
-    margin-top: 0.2rem;
-    padding-left: 0.1rem;
-    padding-bottom: 0.2rem;
-}
-
-/* Scrollbar styling for modal */
-.modal-content::-webkit-scrollbar {
-    width: 8px;
-}
-
-.modal-content::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 10px;
-}
-
-.modal-content::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Hover effects for buttons */
-button {
-    transition: all 0.2s ease;
-}
-
-button:hover {
-    transform: scale(1.02);
-}
+/* ── GLOBAL BUTTON TRANSITION ────────────────────────────────────────────── */
+button { transition: all 0.2s ease; }

@@ -1,4 +1,4 @@
-# core_analysis.py (fixed - modal now works properly)
+# core_analysis.py (enhanced – uses st.dialog for modals + 4 metric cards)
 
 import os
 import streamlit as st
@@ -53,535 +53,497 @@ def load_data():
     }
     df = df.rename(columns=rename_map)
     df['weekly_study_hours'] = df['study_hours_per_day'] * df['study_days_per_week']
-    
-    # Ensure course column exists
+
     if 'course' not in df.columns:
         courses = ['Computer Science', 'Mathematics', 'Physics', 'Biology', 'Economics']
         df['course'] = np.random.choice(courses, size=len(df))
-    
-    # Ensure gender column exists
+
     if 'gender' not in df.columns:
         df['gender'] = np.random.choice(['Male', 'Female'], size=len(df))
-    
+
     return df
 
 
-# -------------------------
-# Modal Dialog for Detailed View (Hidden by default)
-# -------------------------
-def show_details_modal(df, title="Student Population Details"):
-    """Display a modal with detailed breakdown of students"""
-    
-    # Get gender distribution
-    gender_counts = df['gender'].value_counts()
-    gender_df = pd.DataFrame({
-        'Category': gender_counts.index,
-        'Count': gender_counts.values,
-        'Percentage': (gender_counts.values / len(df) * 100).round(1)
-    })
-    
-    # Get course distribution
-    course_counts = df['course'].value_counts()
-    course_df = pd.DataFrame({
-        'Category': course_counts.index,
-        'Count': course_counts.values,
-        'Percentage': (course_counts.values / len(df) * 100).round(1)
-    })
-    
-    # Create a unique ID for this modal to avoid conflicts
-    modal_id = "detailsModal"
-    
-    # Create HTML for modal - HIDDEN by default (display: none)
-    modal_html = f"""
-    <div id="{modal_id}" style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        backdrop-filter: blur(8px);
-        z-index: 9999;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        font-family: system-ui, -apple-system, sans-serif;
-    ">
-        <div style="
-            background: white;
-            border-radius: 32px;
-            max-width: 650px;
-            width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-            animation: slideUp 0.3s ease-out;
-        ">
-            <div style="
-                padding: 1.5rem;
-                border-bottom: 1px solid #e5e7eb;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                position: sticky;
-                top: 0;
-                background: white;
-                border-radius: 32px 32px 0 0;
-            ">
-                <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #111827;">
-                    📊 {title}
-                </h2>
-                <button onclick="closeModal('{modal_id}')" style="
-                    background: none;
-                    border: none;
-                    font-size: 1.5rem;
-                    cursor: pointer;
-                    color: #6b7280;
-                    padding: 0.5rem;
-                    border-radius: 999px;
-                    transition: all 0.2s;
-                " onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='transparent'">
-                    ✕
-                </button>
-            </div>
-            
-            <div style="padding: 1.5rem;">
-                <!-- Gender Distribution -->
-                <div style="margin-bottom: 2rem;">
-                    <h3 style="
-                        font-size: 1.1rem;
-                        font-weight: 600;
-                        color: #374151;
-                        margin-bottom: 1rem;
-                        display: flex;
-                        align-items: center;
-                        gap: 0.5rem;
-                    ">
-                        <span>👥</span> Gender Distribution
-                    </h3>
-                    <div style="
-                        background: #f9fafb;
-                        border-radius: 16px;
-                        padding: 1rem;
-                    ">
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="border-bottom: 2px solid #e5e7eb;">
-                                    <th style="text-align: left; padding: 0.75rem 0.5rem; color: #6b7280; font-weight: 600;">Gender</th>
-                                    <th style="text-align: right; padding: 0.75rem 0.5rem; color: #6b7280; font-weight: 600;">Count</th>
-                                    <th style="text-align: right; padding: 0.75rem 0.5rem; color: #6b7280; font-weight: 600;">Percentage</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-    """
-    
-    for _, row in gender_df.iterrows():
-        modal_html += f"""
-        <tr style="border-bottom: 1px solid #f3f4f6;">
-            <td style="padding: 0.75rem 0.5rem; font-weight: 500;">{row['Category']}</td>
-            <td style="padding: 0.75rem 0.5rem; text-align: right;">{row['Count']:,}</td>
-            <td style="padding: 0.75rem 0.5rem; text-align: right;">{row['Percentage']}%</td>
-        </tr>
-        """
-    
-    modal_html += """
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Course Distribution -->
-                <div>
-                    <h3 style="
-                        font-size: 1.1rem;
-                        font-weight: 600;
-                        color: #374151;
-                        margin-bottom: 1rem;
-                        display: flex;
-                        align-items: center;
-                        gap: 0.5rem;
-                    ">
-                        <span>📚</span> Course Distribution
-                    </h3>
-                    <div style="
-                        background: #f9fafb;
-                        border-radius: 16px;
-                        padding: 1rem;
-                        max-height: 350px;
-                        overflow-y: auto;
-                    ">
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="border-bottom: 2px solid #e5e7eb; position: sticky; top: 0; background: #f9fafb;">
-                                    <th style="text-align: left; padding: 0.75rem 0.5rem; color: #6b7280; font-weight: 600;">Course</th>
-                                    <th style="text-align: right; padding: 0.75rem 0.5rem; color: #6b7280; font-weight: 600;">Count</th>
-                                    <th style="text-align: right; padding: 0.75rem 0.5rem; color: #6b7280; font-weight: 600;">Percentage</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-    """
-    
-    for _, row in course_df.iterrows():
-        # Truncate long course names
-        course_name = str(row['Category'])[:50] + '...' if len(str(row['Category'])) > 50 else row['Category']
-        modal_html += f"""
-        <tr style="border-bottom: 1px solid #f3f4f6;">
-            <td style="padding: 0.75rem 0.5rem; font-size: 0.9rem;">{course_name}</td>
-            <td style="padding: 0.75rem 0.5rem; text-align: right;">{row['Count']:,}</td>
-            <td style="padding: 0.75rem 0.5rem; text-align: right;">{row['Percentage']}%</td>
-        </tr>
-        """
-    
-    modal_html += f"""
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div style="
-                    margin-top: 1.5rem;
-                    padding-top: 1rem;
-                    border-top: 1px solid #e5e7eb;
-                    text-align: center;
-                    color: #6b7280;
-                    font-size: 0.875rem;
-                ">
-                    Total Students: {len(df):,} | Total Courses: {len(course_df)} | Genders: {len(gender_df)}
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <style>
-        @keyframes slideUp {{
-            from {{
-                opacity: 0;
-                transform: translateY(20px);
-            }}
-            to {{
-                opacity: 1;
-                transform: translateY(0);
-            }}
-        }}
-    </style>
-    
-    <script>
-        function showModal(modalId) {{
-            var modal = document.getElementById(modalId);
-            if (modal) {{
-                modal.style.display = 'flex';
-                modal.style.alignItems = 'center';
-                modal.style.justifyContent = 'center';
-                console.log('Modal shown:', modalId);
-            }} else {{
-                console.log('Modal not found:', modalId);
-            }}
-        }}
-        
-        function closeModal(modalId) {{
-            var modal = document.getElementById(modalId);
-            if (modal) {{
-                modal.style.display = 'none';
-                console.log('Modal closed:', modalId);
-            }}
-        }}
-        
-        // Close modal when clicking outside
-        document.addEventListener('click', function(e) {{
-            var modal = document.getElementById('{modal_id}');
-            if (modal && modal.style.display === 'flex') {{
-                if (e.target === modal) {{
-                    closeModal('{modal_id}');
-                }}
-            }}
-        }});
-        
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(e) {{
-            if (e.key === 'Escape') {{
-                var modal = document.getElementById('{modal_id}');
-                if (modal && modal.style.display === 'flex') {{
-                    closeModal('{modal_id}');
-                }}
-            }}
-        }});
-    </script>
-    """
-    
-    return modal_html, modal_id
+# ─────────────────────────────────────────────────────────────────────────────
+# HELPERS
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _categorize_cgpa(cgpa):
+    if cgpa >= 3.9:
+        return '4.00 – Excellent'
+    elif cgpa >= 3.4:
+        return '3.50 – Good'
+    elif cgpa >= 2.4:
+        return '2.50 – Satisfactory'
+    else:
+        return '1.00 – Needs Improvement'
 
 
-# -------------------------
-# Enhanced Metric Card with Course Bar Chart & Modal
-# -------------------------
-def metric_card_total_students(df):
-    """Metric card for Total Students Surveyed with course distribution bar chart"""
+# ─────────────────────────────────────────────────────────────────────────────
+# NATIVE STREAMLIT DIALOG (st.dialog – Streamlit ≥ 1.36)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _render_student_details(df: pd.DataFrame):
+    """Render the full student-population breakdown inside a dialog or expander."""
+
+    total = len(df)
+
+    # ── Gender ──────────────────────────────────────────────────────────────
+    st.markdown("#### 👥 Gender Distribution")
+    gender_counts = df['gender'].value_counts().reset_index()
+    gender_counts.columns = ['Gender', 'Count']
+    gender_counts['Percentage'] = (gender_counts['Count'] / total * 100).round(1).astype(str) + '%'
+
+    # Changed: Bar chart to PIE CHART
+    gender_color_map = {
+        'Male': "#4A7FBF8C",    # Blue
+        'Female': "#EC489A77",   # Pink
+    }
+
+    gender_colors = [gender_color_map.get(gender, '#9CA3AF') for gender in gender_counts['Gender']]
     
-    total_students = len(df)
-    
-    # Get course distribution
-    course_counts = df['course'].value_counts().reset_index()
-    course_counts.columns = ['course', 'students']
-    course_counts = course_counts.sort_values('students', ascending=False)
-    
-    # Create bar chart
-    fig = go.Figure()
-    
-    fig.add_trace(go.Bar(
-        x=course_counts['course'],
-        y=course_counts['students'],
-        marker_color=TEAL,
-        marker_opacity=0.7,
-        marker_line_color='white',
-        marker_line_width=1,
-        showlegend=False,
-        hovertemplate='<b>%{x}</b><br>Students: %{y}<extra></extra>'
+    g_fig = go.Figure(go.Pie(
+        labels=gender_counts['Gender'],
+        values=gender_counts['Count'],
+        marker=dict(colors=gender_colors, line=dict(color='white', width=2)),
+        textinfo='label+percent',
+        textposition='auto',
+        hoverinfo='label+value+percent',
+        hole=0.4,  # Donut style (optional, set to 0 for full pie)
+        showlegend=True,
+        legendgroup='gender',
+        pull=[0.02 if i == gender_counts['Count'].argmax() else 0 for i in range(len(gender_counts))],
     ))
+    g_fig.update_layout(
+        height=320,
+        margin=dict(l=20, r=20, t=30, b=20),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        showlegend=False,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.15,
+            xanchor="center",
+            x=0.5,
+            font=dict(size=11)
+        ),
+    )
+    st.plotly_chart(g_fig, use_container_width=True, config={'displayModeBar': False})
+    st.dataframe(
+        gender_counts,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    st.divider()
+
+        # ── Course ───────────────────────────────────────────────────────────────
+    st.markdown("#### 📚 Course Distribution")
     
-    fig.update_layout(
-        height=80,
-        width=140,
-        margin=dict(l=0, r=0, t=0, b=0),
+    # Function to extract course family
+    def get_course_family(course):
+        import re
+        # Remove prefixes
+        course = re.sub(r'^(Bachelor of |Diploma in )', '', str(course))
+        
+        # Map similar courses
+        if re.search(r'Computer Science|Software Engineering|Game Development|Information Technology|Informatics Maritime', course, re.I):
+            return 'Computer Science'
+        elif re.search(r'Accounting', course, re.I):
+            return 'Accounting'
+        elif re.search(r'Medicine|MBBS|Biomedical|Dental Surgery|Medical Imaging|Physiotherapy', course, re.I):
+            return 'Medicine/Medical'
+        elif re.search(r'Business|Management|Investment|International Business', course, re.I):
+            return 'Business/Management'
+        elif re.search(r'Digital Media|Media Production', course, re.I):
+            return 'Digital Media/Production'
+        elif re.search(r'Islamic|Halal', course, re.I):
+            return 'Islamic Studies/Finance'
+        elif re.search(r'Education|Teaching|TESL', course, re.I):
+            return 'Education/Teaching'
+        elif re.search(r'Engineering', course, re.I):
+            return 'Engineering'
+        elif re.search(r'Pharmacy', course, re.I):
+            return 'Pharmacy'
+        elif re.search(r'Arts', course, re.I):
+            return 'Arts'
+        elif re.search(r'Psychology', course, re.I):
+            return 'Psychology'
+        elif re.search(r'Science(?! Computer)', course, re.I):
+            return 'Science'
+        elif re.search(r'Chemistry', course, re.I):
+            return 'Chemistry'
+        elif re.search(r'Arabic', course, re.I):
+            return 'Arabic'
+        elif re.search(r'Communication', course, re.I):
+            return 'Communications'
+        else:
+            return course.strip()
+    
+    # Apply course family mapping
+    df['course_family'] = df['course'].apply(get_course_family)
+    
+    # Count by course family
+    course_counts = df['course_family'].value_counts().reset_index()
+    course_counts.columns = ['Course Family', 'Students']
+    course_counts['% of Total'] = (course_counts['Students'] / total * 100).round(1).astype(str) + '%'
+    
+    # Sort by student count descending for better visualization
+    course_counts = course_counts.sort_values('Students', ascending=True)
+
+    # Create color palette for courses (using a nice gradient)
+    course_colors = px.colors.qualitative.Set3 + px.colors.qualitative.Pastel
+    
+    c_fig = go.Figure(go.Bar(
+        y=course_counts['Course Family'],
+        x=course_counts['Students'],
+        orientation='h',
+        marker_color=course_colors[:len(course_counts)],
+        marker_opacity=0.85,
+        text=course_counts['Students'],
+        textposition='outside',
+        textfont=dict(size=10, color='#374151'),
+        hovertemplate='<b>%{y}</b><br>Students: %{x}<br>% of Total: %{customdata}<extra></extra>',
+        customdata=course_counts['% of Total'],
+    ))
+    c_fig.update_layout(
+        height=max(350, len(course_counts) * 35),  # Dynamic height based on number of courses
+        margin=dict(l=10, r=60, t=30, b=20),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         xaxis=dict(
-            tickangle=0,
-            tickfont=dict(size=9, color='#6b7280'),
-            showgrid=False,
-            showline=False,
+            showgrid=True,
+            gridcolor='#E5E7EB',
+            gridwidth=0.5,
             showticklabels=True,
-            ticks='',
+            tickfont=dict(size=10),
+            title="Number of Students",
+            title_font=dict(size=11),
         ),
         yaxis=dict(
             showgrid=False,
-            showline=False,
-            showticklabels=False,
-            ticks='',
+            tickfont=dict(size=10.5),
+            automargin=True,
+            title=None,
         ),
-        bargap=0.3,
+        showlegend=False,
+        bargap=0.2,
     )
+    st.plotly_chart(c_fig, use_container_width=True, config={'displayModeBar': False})
     
-    # Convert to HTML
-    chart_html = fig.to_html(include_plotlyjs=False, full_html=False, config={'displayModeBar': False})
+    st.dataframe(
+        course_counts.sort_values('Students', ascending=False),
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Course Family": "Course Family",
+            "Students": st.column_config.NumberColumn("Students", format="%d"),
+            "% of Total": st.column_config.TextColumn("% of Total"),
+        }
+    )
+
+    st.divider()
+
+
+def _render_cgpa_details(df: pd.DataFrame):
+    """Render the full student-population breakdown inside a dialog or expander."""
+
+    total = len(df)
+
+    # ── CGPA Groups ──────────────────────────────────────────────────────────
+    st.markdown("#### 🎓 Students per CGPA Group")
+    df_copy = df.copy()
+    df_copy['CGPA Group'] = df_copy['cgpa'].apply(_categorize_cgpa)
+
+    cgpa_group_order = [
+        '4.00 – Excellent',
+        '3.50 – Good',
+        '2.50 – Satisfactory',
+        '1.00 – Needs Improvement',
+    ]
     
-    # Create the modal HTML
-    modal_html, modal_id = show_details_modal(df, "Student Population Details")
+    # Shortened labels for better display
+    short_labels = {
+        '4.00 – Excellent': 'Excellent (4.00)',
+        '3.50 – Good': 'Good (3.00-3.99)',
+        '2.50 – Satisfactory': 'Satisfactory (2.00-2.99)',
+        '1.00 – Needs Improvement': 'Needs Improvement (1.00-1.99)',
+    }
     
-    # Create the button and card HTML
+    group_colors = {
+        '4.00 – Excellent': '#C5E0B4',  # Soft pastel green
+        '3.50 – Good': '#A7C7E8',       # Soft pastel blue
+        '2.50 – Satisfactory': '#FFD966', # Soft pastel yellow
+        '1.00 – Needs Improvement': '#F4B6C2', # Soft pastel pink
+    }
+
+    cgpa_counts = (
+        df_copy['CGPA Group']
+        .value_counts()
+        .reindex(cgpa_group_order, fill_value=0)
+        .reset_index()
+    )
+    cgpa_counts.columns = ['CGPA Group', 'Students']
+    cgpa_counts['% of Total'] = (cgpa_counts['Students'] / total * 100).round(1).astype(str) + '%'
+    
+    # Add short labels for display
+    cgpa_counts['Display Group'] = cgpa_counts['CGPA Group'].map(short_labels)
+
+    # Gender breakdown per CGPA group
+    cgpa_gender = (
+        df_copy.groupby(['CGPA Group', 'gender'])
+        .size()
+        .unstack(fill_value=0)
+        .reindex(cgpa_group_order, fill_value=0)
+        .reset_index()
+    )
+
+    # FIXED: Bar chart with proper label positioning
+    cg_fig = go.Figure()
+    
+    # Get max value for dynamic y-axis range (adds headroom for labels)
+    max_students = cgpa_counts['Students'].max()
+    
+    for i, group in enumerate(cgpa_group_order):
+        mask = cgpa_counts['CGPA Group'] == group
+        student_count = cgpa_counts.loc[mask, 'Students'].values[0]
+        
+        cg_fig.add_trace(go.Bar(
+            x=[short_labels[group]],  # Use short label
+            y=[student_count],
+            name=group,
+            marker_color=group_colors[group],
+            text=[f"{student_count}"],
+            textposition='outside',
+            textfont=dict(size=11, color='#374151'),
+            hovertemplate=f'<b>{short_labels[group]}</b><br>Students: {student_count}<br>Percentage: {(student_count/total*100):.1f}%<extra></extra>',
+        ))
+    
+    cg_fig.update_layout(
+        height=360,  # Increased height to accommodate labels
+        margin=dict(l=30, r=30, t=50, b=30),  # Increased top margin for label visibility
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        xaxis=dict(
+            showgrid=False,
+            tickfont=dict(size=12),
+            title="CGPA Range",
+            title_font=dict(size=12),
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridcolor='#E5E7EB',
+            gridwidth=0.5,
+            showticklabels=True,
+            tickfont=dict(size=11),
+            title="Number of Students",
+            title_font=dict(size=12),
+            range=[0, max_students * 1.25],  # Add 25% headroom for labels
+        ),
+        showlegend=False,
+        bargap=0.35,
+    )
+    st.plotly_chart(cg_fig, use_container_width=True, config={'displayModeBar': False})
+
+    # Merge totals with gender breakdown
+    display_df = cgpa_counts[['Display Group', 'Students', '% of Total']].copy()
+    display_df.columns = ['CGPA Group', 'Students', '% of Total']
+    
+    for col in cgpa_gender.columns[1:]:
+        if col in cgpa_gender.columns:
+            display_df[col] = cgpa_gender[col].values
+    
+    st.dataframe(display_df, use_container_width=True, hide_index=True)
+
+    st.caption(f"Total students: **{total:,}** · Genders: **{len(df['gender'].unique())}**")
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DIALOG WRAPPER – uses @st.dialog when available, expander as fallback
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _open_student_details_dialog(df: pd.DataFrame):
+    """Try to open a native Streamlit dialog."""
+    try:
+        @st.dialog("📊 Student Population Details", width="large")
+        def _dialog():
+            _render_student_details(df)
+        _dialog()
+    except AttributeError:
+        with st.expander("📊 Student Population Details", expanded=True):
+            _render_student_details(df)
+
+def _open_cgpa_details_dialog(df: pd.DataFrame):
+    """Try to open a native Streamlit dialog."""
+    try:
+        @st.dialog("📊 CGPA Distribution Details", width="large")
+        def _dialog():
+            _render_cgpa_details(df)
+        _dialog()
+    except AttributeError:
+        with st.expander("📊 CGPA Distribution Details", expanded=True):
+            _render_cgpa_details(df)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# METRIC CARD 1 – Total Students (Number only)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def metric_card_total_students(df):
+    """Metric card: Just the total number of students."""
+    
+    total_students = len(df)
+    
     st.markdown(
         f"""
         <div style="
-            background: linear-gradient(135deg, rgba(46, 173, 138, 0.15) 0%, rgba(74, 127, 191, 0.1) 100%);
-            border-radius: 20px;
-            border: 1px solid rgba(203, 213, 225, 0.5);
-            padding: 1.5rem;
-            backdrop-filter: blur(8px);
-            position: relative;
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+            border-radius: 24px;
+            border: 1px solid rgba(46,173,138,0.15);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
             overflow: hidden;
-            height: 100%;
+            width: 100%;
         ">
-            <div style="position: relative; z-index: 10;">
+            <div style="
+                background: linear-gradient(135deg, rgba(46,173,138,0.08) 0%, rgba(46,173,138,0.02) 100%);
+                padding: 0.9rem 1.2rem 1rem 1.2rem;
+                text-align: center;
+            ">
                 <div style="
-                    display: inline-block;
-                    padding: 0.25rem 0.75rem;
-                    background: rgba(255, 255, 255, 0.8);
-                    backdrop-filter: blur(4px);
-                    color: #374151;
-                    font-size: 0.7rem;
-                    font-weight: 500;
-                    border-radius: 9999px;
-                    margin-bottom: 1rem;
-                    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-                ">
-                    Total Students Surveyed
-                </div>
-                <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem;">
-                    <div>
-                        <div style="font-size: 3rem; font-weight: 800; color: #111827; margin-bottom: 0.25rem; line-height: 1;">
-                            {total_students:,}
-                        </div>
-                        <div style="font-size: 0.7rem; color: #6b7280;">
-                            Across {len(course_counts)} courses
-                        </div>
-                    </div>
-                    <div style="flex-shrink: 0; width: 140px;">
-                        {chart_html}
-                    </div>
-                </div>
-            </div>
-            <button 
-                onclick="showModal('{modal_id}')"
-                style="
-                    position: absolute;
-                    bottom: 1rem;
-                    right: 1rem;
-                    display: flex;
+                    display: inline-flex;
                     align-items: center;
-                    gap: 0.5rem;
-                    padding: 0.5rem 1rem;
-                    background: rgba(255, 255, 255, 0.9);
-                    backdrop-filter: blur(4px);
-                    color: #374151;
+                    justify-content: center;
+                    width: 40px;
+                    height: 40px;
+                    background: rgba(46,173,138,0.12);
+                    border-radius: 12px;
+                    margin-bottom: 0.75rem;
+                ">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2EAD8A" stroke-width="1.8">
+                        <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                </div>
+                <div style="
                     font-size: 0.75rem;
-                    font-weight: 500;
-                    border-radius: 9999px;
-                    border: 1px solid rgba(203, 213, 225, 0.5);
-                    cursor: pointer;
-                    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-                    transition: all 0.2s;
-                "
-                onmouseover="this.style.backgroundColor='rgba(255,255,255,1)'; this.style.transform='scale(1.02)'"
-                onmouseout="this.style.backgroundColor='rgba(255,255,255,0.9)'; this.style.transform='scale(1)'"
-            >
-                View Details
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-            </button>
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    color: #2EAD8A;
+                    margin-bottom: 0.5rem;
+                ">
+                    Total Students
+                </div>
+                <div style="
+                    font-size: 3rem;
+                    font-weight: 800;
+                    color: #111827;
+                    line-height: 1;
+                    margin-bottom: 0.25rem;
+                ">
+                    {total_students:,}
+                </div>
+                <div style="
+                    font-size: 0.9rem;
+                    color: #9CA3AF;
+                    margin-top: 0.25rem;
+                ">
+                    participants<br>
+                    surveyed 
+                </div>     
         </div>
-        {modal_html}
         """,
         unsafe_allow_html=True,
     )
 
 
-# -------------------------
-# Enhanced Metric Card with CGPA Distribution Pie Chart
-# -------------------------
+# ─────────────────────────────────────────────────────────────────────────────
+# METRIC CARD 2 – Average CGPA
+# ─────────────────────────────────────────────────────────────────────────────
+
 def metric_card_avg_cgpa(df):
-    """Metric card for Average CGPA with enhanced distribution pie chart"""
+    """Metric card: Average CGPA with a simple gauge style."""
     
     avg_cgpa = df['cgpa'].mean()
     
-    # Define CGPA ranges with more detailed categories
-    def categorize_cgpa(cgpa):
-        if cgpa >= 3.9:
-            return '4.00 (Excellent)'
-        elif cgpa >= 3.4:
-            return '3.50 (Good)'
-        elif cgpa >= 2.4:
-            return '2.50 (Satisfactory)'
-        else:
-            return '1.00 (Needs Improvement)'
-    
-    df['cgpa_category'] = df['cgpa'].apply(categorize_cgpa)
-    
-    # Calculate distribution
-    distribution = df['cgpa_category'].value_counts()
-    
-    # Ensure all categories exist
-    all_categories = ['4.00 (Excellent)', '3.50 (Good)', '2.50 (Satisfactory)', '1.00 (Needs Improvement)']
-    for cat in all_categories:
-        if cat not in distribution:
-            distribution[cat] = 0
-    
-    distribution = distribution[all_categories]
-    
-    # Colors for pie chart
-    pie_colors = {
-        '4.00 (Excellent)': PURPLE,
-        '3.50 (Good)': BLUE,
-        '2.50 (Satisfactory)': AMBER,
-        '1.00 (Needs Improvement)': CORAL
-    }
-    
-    # Create enhanced pie chart with better styling
-    fig = go.Figure()
-    
-    # Get values and labels for display
-    labels = [cat.split(' ')[0] for cat in distribution.index]
-    values = distribution.values
-    
-    fig.add_trace(go.Pie(
-        labels=labels,
-        values=values,
-        hole=0.55,
-        marker=dict(
-            colors=[pie_colors[cat] for cat in distribution.index],
-            line=dict(color='white', width=2)
-        ),
-        textinfo='percent',
-        textposition='inside',
-        textfont=dict(size=10, color='white', weight='bold'),
-        hoverinfo='label+percent+value',
-        showlegend=False,
-        sort=False,
-        pull=[0.02 if v == max(values) else 0 for v in values],
-    ))
-    
-    fig.update_layout(
-        height=120,
-        width=120,
-        margin=dict(l=0, r=0, t=0, b=0),
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        annotations=[
-            dict(
-                text=f"{avg_cgpa:.2f}",
-                x=0.5, y=0.5,
-                font=dict(size=16, color='#1f2937', weight='bold'),
-                showarrow=False
-            )
-        ]
-    )
-    
-    chart_html = fig.to_html(include_plotlyjs=False, full_html=False, config={'displayModeBar': False})
-    
-    # Calculate percentages for display
-    total = distribution.sum()
-    percentages = {cat: (dist/total)*100 for cat, dist in distribution.items()}
+    # Create a simple progress bar visualization
+    progress_percent = (avg_cgpa / 4.0) * 100
     
     st.markdown(
         f"""
         <div style="
-            background: linear-gradient(135deg, rgba(123, 104, 200, 0.12) 0%, rgba(232, 160, 32, 0.08) 100%);
-            border-radius: 20px;
-            border: 1px solid rgba(203, 213, 225, 0.5);
-            padding: 1.5rem;
-            backdrop-filter: blur(8px);
-            position: relative;
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+            border-radius: 24px;
+            border: 1px solid rgba(232,160,32,0.15);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
             overflow: hidden;
-            height: 100%;
+            width: 100%;
         ">
-            <div style="position: relative; z-index: 10;">
+            <div style="
+                background: linear-gradient(135deg, rgba(232,160,32,0.06) 0%, rgba(232,160,32,0.01) 100%);
+                padding: 1rem 1.2rem 1rem 1.2rem;
+                text-align: center;
+            ">
                 <div style="
-                    display: inline-block;
-                    padding: 0.25rem 0.75rem;
-                    background: rgba(255, 255, 255, 0.8);
-                    backdrop-filter: blur(4px);
-                    color: #374151;
-                    font-size: 0.7rem;
-                    font-weight: 500;
-                    border-radius: 9999px;
-                    margin-bottom: 1rem;
-                    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 40px;
+                    height: 40px;
+                    background: rgba(232,160,32,0.12);
+                    border-radius: 12px;
+                    margin-bottom: 0.75rem;
+                ">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8A020" stroke-width="1.8">
+                        <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </div>
+                <div style="
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    color: #E8A020;
+                    margin-bottom: 0.5rem;
                 ">
                     Average CGPA
                 </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;">
-                    <div>
-                        <div style="font-size: 3rem; font-weight: 800; color: #111827; margin-bottom: 0.25rem; line-height: 1;">
-                            {avg_cgpa:.2f}
-                        </div>
-                        <div style="font-size: 0.7rem; color: #6b7280;">
-                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                                <div style="width: 0.5rem; height: 0.5rem; border-radius: 9999px; background-color: {PURPLE};"></div>
-                                <span>Excellent: {percentages['4.00 (Excellent)']:.1f}%</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                                <div style="width: 0.5rem; height: 0.5rem; border-radius: 9999px; background-color: {BLUE};"></div>
-                                <span>Good: {percentages['3.50 (Good)']:.1f}%</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <div style="width: 0.5rem; height: 0.5rem; border-radius: 9999px; background-color: {AMBER};"></div>
-                                <span>Satisfactory: {percentages['2.50 (Satisfactory)']:.1f}%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="flex-shrink: 0; width: 120px; height: 120px;">
-                        {chart_html}
-                    </div>
+                <div style="
+                    font-size: 3rem;
+                    font-weight: 800;
+                    color: #111827;
+                    line-height: 1;
+                    margin-bottom: 0.5rem;
+                ">
+                    {avg_cgpa:.2f}
+                </div>
+                <div style="
+                    background: rgba(232,160,32,0.1);
+                    border-radius: 10px;
+                    height: 6px;
+                    width: 100%;
+                    margin: 0.75rem 0;
+                    overflow: hidden;
+                ">
+                    <div style="
+                        background: linear-gradient(90deg, #E8A020 0%, #F59E0B 100%);
+                        width: {progress_percent:.1f}%;
+                        height: 100%;
+                        border-radius: 10px;
+                        transition: width 0.5s ease;
+                    "></div>
+                </div>
+                <div style="
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 0.65rem;
+                    color: #9CA3AF;
+                    margin-top: 0.25rem;
+                ">
+                    <span>0.00</span>
+                    <span>4.00 Scale</span>
+                    <span>4.00</span>
                 </div>
             </div>
         </div>
@@ -589,23 +551,21 @@ def metric_card_avg_cgpa(df):
         unsafe_allow_html=True,
     )
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Chart 1 – CGPA vs Weekly Study Hours Scatter
+# ─────────────────────────────────────────────────────────────────────────────
 
-# -------------------------
-# Enhanced Chart 1 – CGPA vs Weekly Study Hours Scatter
-# -------------------------
 def cgpa_vs_study_hours_scatter(df):
-    """Enhanced scatter plot: CGPA vs Weekly Study Hours with improved trend line."""
-    
+    """Enhanced scatter plot: CGPA vs Weekly Study Hours with trend line."""
+
     plot_df = df[['weekly_study_hours', 'cgpa']].dropna().copy()
-    
+
     np.random.seed(42)
     jitter_amount = 0.08
     plot_df['cgpa_jittered'] = plot_df['cgpa'] + np.random.uniform(-jitter_amount, jitter_amount, size=len(plot_df))
-    
-    # Calculate correlation
+
     correlation = plot_df['weekly_study_hours'].corr(plot_df['cgpa'])
-    
-    # Color based on CGPA
+
     colors = []
     for cgpa in plot_df['cgpa']:
         if cgpa >= 3.9:
@@ -616,16 +576,16 @@ def cgpa_vs_study_hours_scatter(df):
             colors.append(AMBER)
         else:
             colors.append(CORAL)
-    
+
     hover_texts = [
         f"<b>CGPA: {row['cgpa']:.2f}</b><br>"
         f"Weekly Study Hours: {row['weekly_study_hours']:.0f} hrs/week<br>"
         f"Daily Average: {row['weekly_study_hours']/7:.1f} hrs/day"
         for _, row in plot_df.iterrows()
     ]
-    
+
     fig = go.Figure()
-    
+
     fig.add_trace(go.Scatter(
         x=plot_df['weekly_study_hours'],
         y=plot_df['cgpa_jittered'],
@@ -642,25 +602,23 @@ def cgpa_vs_study_hours_scatter(df):
         hoverinfo='text',
         showlegend=False,
     ))
-    
-    # Calculate and add trend line with confidence interval
+
     x_trend = plot_df['weekly_study_hours']
     y_trend = plot_df['cgpa']
     slope, intercept, r_value, p_value, std_err = stats.linregress(x_trend, y_trend)
     x_line = np.linspace(x_trend.min(), x_trend.max(), 100)
     y_line = slope * x_line + intercept
-    
-    # Calculate confidence interval
+
     n = len(x_trend)
-    t_value = stats.t.ppf(0.975, n-2)
+    t_value = stats.t.ppf(0.975, n - 2)
     y_pred = slope * x_trend + intercept
     residuals = y_trend - y_pred
-    mse = np.sum(residuals**2) / (n-2)
+    mse = np.sum(residuals**2) / (n - 2)
     x_mean = np.mean(x_trend)
     se_line = np.sqrt(mse * (1/n + (x_line - x_mean)**2 / np.sum((x_trend - x_mean)**2)))
     ci_upper = y_line + t_value * se_line
     ci_lower = y_line - t_value * se_line
-    
+
     fig.add_trace(go.Scatter(
         x=np.concatenate([x_line, x_line[::-1]]),
         y=np.concatenate([ci_upper, ci_lower[::-1]]),
@@ -671,7 +629,7 @@ def cgpa_vs_study_hours_scatter(df):
         showlegend=True,
         hoverinfo='none',
     ))
-    
+
     fig.add_trace(go.Scatter(
         x=x_line,
         y=y_line,
@@ -680,8 +638,7 @@ def cgpa_vs_study_hours_scatter(df):
         line=dict(color=TEAL, width=3, dash='solid'),
         showlegend=True,
     ))
-    
-    # Add horizontal line at average CGPA
+
     avg_cgpa = plot_df['cgpa'].mean()
     fig.add_hline(
         y=avg_cgpa,
@@ -692,7 +649,7 @@ def cgpa_vs_study_hours_scatter(df):
         annotation_position="bottom right",
         annotation_font=dict(size=10, color=GRAY)
     )
-    
+
     fig.update_layout(
         template="plotly_white",
         height=500,
@@ -736,38 +693,38 @@ def cgpa_vs_study_hours_scatter(df):
         ),
         hovermode='closest',
     )
-    
+
     return fig, correlation
 
 
-# -------------------------
-# Enhanced zoomed scatter plot for CGPA 3.5 focus
-# -------------------------
+# ─────────────────────────────────────────────────────────────────────────────
+# Chart 2 – Zoomed scatter for CGPA 3.5 focus
+# ─────────────────────────────────────────────────────────────────────────────
+
 def cgpa_vs_study_hours_zoomed(df, target_cgpa=3.5):
-    """Enhanced zoomed scatter plot focusing on a single CGPA group."""
-    
-    # Filter for target CGPA range
+    """Zoomed scatter plot focusing on a single CGPA group."""
+
     if target_cgpa == 3.5:
         plot_df = df[(df['cgpa'] >= 3.4) & (df['cgpa'] < 3.9)][['weekly_study_hours', 'cgpa']].dropna().copy()
     else:
         plot_df = df[df['cgpa'] == target_cgpa][['weekly_study_hours', 'cgpa']].dropna().copy()
-    
+
     if len(plot_df) == 0:
         return None, 0, 0, 0, 0, 0, 0
-    
-    n_students = len(plot_df)
-    mean_hours = plot_df['weekly_study_hours'].mean()
-    median_hours = plot_df['weekly_study_hours'].median()
-    std_hours = plot_df['weekly_study_hours'].std()
-    min_hours = plot_df['weekly_study_hours'].min()
-    max_hours = plot_df['weekly_study_hours'].max()
-    
+
+    n_students  = len(plot_df)
+    mean_hours  = plot_df['weekly_study_hours'].mean()
+    median_hours= plot_df['weekly_study_hours'].median()
+    std_hours   = plot_df['weekly_study_hours'].std()
+    min_hours   = plot_df['weekly_study_hours'].min()
+    max_hours   = plot_df['weekly_study_hours'].max()
+
     np.random.seed(42)
     jitter_amount = 0.03
     plot_df['cgpa_jittered'] = plot_df['cgpa'] + np.random.uniform(-jitter_amount, jitter_amount, size=len(plot_df))
-    
+
     colors = [TEAL if hours > mean_hours else BLUE for hours in plot_df['weekly_study_hours']]
-    
+
     hover_texts = [
         f"<b>CGPA: {row['cgpa']:.2f}</b><br>"
         f"Weekly Study Hours: {row['weekly_study_hours']:.0f} hrs/week<br>"
@@ -775,9 +732,9 @@ def cgpa_vs_study_hours_zoomed(df, target_cgpa=3.5):
         f"{'📚 Above average study time' if row['weekly_study_hours'] > mean_hours else '✨ Efficient learner (below avg)'}"
         for _, row in plot_df.iterrows()
     ]
-    
+
     fig = go.Figure()
-    
+
     fig.add_trace(go.Scatter(
         x=plot_df['weekly_study_hours'],
         y=plot_df['cgpa_jittered'],
@@ -794,8 +751,7 @@ def cgpa_vs_study_hours_zoomed(df, target_cgpa=3.5):
         hoverinfo='text',
         showlegend=True,
     ))
-    
-    # Add mean line
+
     fig.add_vline(
         x=mean_hours,
         line_dash="dash",
@@ -805,8 +761,6 @@ def cgpa_vs_study_hours_zoomed(df, target_cgpa=3.5):
         annotation_position="top",
         annotation_font=dict(size=11, color=TEAL)
     )
-    
-    # Add median line
     fig.add_vline(
         x=median_hours,
         line_dash="dot",
@@ -816,7 +770,7 @@ def cgpa_vs_study_hours_zoomed(df, target_cgpa=3.5):
         annotation_position="bottom",
         annotation_font=dict(size=10, color=AMBER)
     )
-    
+
     fig.update_layout(
         template="plotly_white",
         height=400,
@@ -859,22 +813,84 @@ def cgpa_vs_study_hours_zoomed(df, target_cgpa=3.5):
         ),
         hovermode='closest',
     )
-    
+
     return fig, n_students, mean_hours, median_hours, std_hours, min_hours, max_hours
 
 
-# -------------------------
+# ─────────────────────────────────────────────────────────────────────────────
 # Main page
-# -------------------------
+# ─────────────────────────────────────────────────────────────────────────────
+
 def show_core_analysis():
     load_css()
     df = load_data()
-    
-    # Ensure course column exists for demo
+
     if 'course' not in df.columns:
         courses = ['Computer Science', 'Mathematics', 'Physics', 'Biology', 'Economics']
         df['course'] = np.random.choice(courses, size=len(df))
-    
+
+    # Display both cards side by side and centered
+    col1, col2 = st.columns([1, 1])  # Creates empty space on sides
+
+    with col1:
+        metric_card_total_students(df)
+    with col2:
+        metric_card_avg_cgpa(df)
+
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+            st.markdown(
+                """
+                <style>
+                div[data-testid="column"]:nth-of-type(1) button {
+                    background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+                    border: none;
+                    border-radius: 9999px;
+                    padding: 0.6rem 1rem;
+                    font-weight: 600;
+                    font-size: 0.85rem;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 8px rgba(46,173,138,0.25);
+                }
+                div[data-testid="column"]:nth-of-type(1) button:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(46,173,138,0.35);
+                    background: linear-gradient(135deg, #1E7B5F 0%, #166B52 100%);
+                }
+                </style>
+                """,
+                unsafe_allow_html=True,
+            )
+            if st.button("👥 View Student Details", key="btn_student_details", use_container_width=True):
+                _open_student_details_dialog(df)
+        
+    with col2:
+                st.markdown(
+                    """
+                    <style>
+                    div[data-testid="column"]:nth-of-type(2) button {
+                        background: linear-gradient(135deg, #E8A020 0%, #C97E0A 100%);
+                        border: none;
+                        border-radius: 9999px;
+                        padding: 0.6rem 1rem;
+                        font-weight: 600;
+                        font-size: 0.85rem;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 2px 8px rgba(232,160,32,0.25);
+                    }
+                    div[data-testid="column"]:nth-of-type(2) button:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 12px rgba(232,160,32,0.35);
+                        background: linear-gradient(135deg, #C97E0A 0%, #B06B07 100%);
+                    }
+                    </style>
+                    """,
+                    unsafe_allow_html=True,
+                )
+                if st.button("📊 View CGPA Details", key="btn_cgpa_details", use_container_width=True):
+                    _open_cgpa_details_dialog(df)
+
     # Page header
     st.markdown(
         """
@@ -894,26 +910,15 @@ def show_core_analysis():
             <h1 style="font-size: 2.5rem; font-weight: 800; color: #111827; margin-bottom: 0.75rem;">
                 The Myth: Study Longer = Better Results
             </h1>
-            <p style="font-size: 1.1rem; color: #6b7280; max-width: 42rem; margin: 0 auto;">
-                We begin by examining the most common assumption — that studying longer 
+            <p style="font-size: 1.1rem; color: #6b7280; max-width: 60rem; margin: 0 auto;">
+                We begin by examining the most common assumption that studying longer 
                 leads to higher academic performance.
             </p>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    
-    # Metric cards side by side
-    col1, col2 = st.columns(2, gap="large")
-    
-    with col1:
-        metric_card_total_students(df)
-    
-    with col2:
-        metric_card_avg_cgpa(df)
-    
-    st.markdown("<div style='height: 2rem;'></div>", unsafe_allow_html=True)
-    
+
     # Main scatter plot
     st.markdown(
         """
@@ -926,10 +931,9 @@ def show_core_analysis():
         """,
         unsafe_allow_html=True,
     )
-    
-    # Create container with card-like styling
+
     fig, correlation = cgpa_vs_study_hours_scatter(df)
-    
+
     st.markdown(
         """
         <div style="
@@ -937,16 +941,14 @@ def show_core_analysis():
             border-radius: 20px;
             border: 1px solid #e5e7eb;
             padding: 1.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.025);
             margin-bottom: 1.5rem;
         ">
         """,
         unsafe_allow_html=True,
     )
-    
     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': True, 'responsive': True})
-    
-    # Footer with correlation info
+
     col_left, col_right = st.columns(2)
     with col_left:
         st.markdown(
@@ -961,39 +963,43 @@ def show_core_analysis():
         )
     with col_right:
         badge_color = "#DC2626" if abs(correlation) < 0.3 else "#F59E0B" if abs(correlation) < 0.5 else "#10B981"
-        badge_text = "Weak Correlation" if abs(correlation) < 0.3 else "Moderate Correlation" if abs(correlation) < 0.5 else "Strong Correlation"
+        badge_text  = "Weak Correlation" if abs(correlation) < 0.3 else "Moderate Correlation" if abs(correlation) < 0.5 else "Strong Correlation"
         st.markdown(
             f"""
-            <div style="display: inline-block; padding: 0.35rem 1rem; background: rgba(239, 68, 68, 0.1); color: {badge_color}; font-size: 0.8rem; font-weight: 600; border-radius: 9999px; float: right;">
+            <div style="display: inline-block; padding: 0.35rem 1rem; background: rgba(239,68,68,0.1);
+                        color: {badge_color}; font-size: 0.8rem; font-weight: 600;
+                        border-radius: 9999px; float: right;">
                 {badge_text}
             </div>
             """,
             unsafe_allow_html=True,
         )
-    
+
     st.markdown("</div>", unsafe_allow_html=True)
-    
-    # Zoomed scatter plot for CGPA 3.5
+
+    # Zoomed scatter
     st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
-    
+
     zoomed_result = cgpa_vs_study_hours_zoomed(df, target_cgpa=3.5)
     if zoomed_result[0] is not None:
         fig_zoomed, n35, mean_hours, median_hours, std_hours, min_hours, max_hours = zoomed_result
-        
+
         st.markdown(
             f"""
             <div style="text-align: center; margin-bottom: 1rem;">
-                <h3 style="font-size: 1.25rem; font-weight: 600; color: #111827;">🔍 Variation in Study Hours within CGPA 3.5 Students</h3>
+                <h3 style="font-size: 1.25rem; font-weight: 600; color: #111827;">
+                    🔍 Variation in Study Hours within CGPA 3.5 Students
+                </h3>
                 <p style="color: #6b7280; font-size: 0.85rem;">
                     n={n35} students | Mean: {mean_hours:.0f} hrs/week | 
                     Median: {median_hours:.0f} hrs/week | Std Dev: {std_hours:.0f} hrs/week | 
-                    Range: {min_hours:.0f}-{max_hours:.0f} hrs
+                    Range: {min_hours:.0f}–{max_hours:.0f} hrs
                 </p>
             </div>
             """,
             unsafe_allow_html=True,
         )
-        
+
         st.markdown(
             """
             <div style="
@@ -1001,14 +1007,13 @@ def show_core_analysis():
                 border-radius: 20px;
                 border: 1px solid #e5e7eb;
                 padding: 1.5rem;
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+                box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
             ">
             """,
             unsafe_allow_html=True,
         )
-        
         st.plotly_chart(fig_zoomed, use_container_width=True, config={'displayModeBar': True, 'responsive': True})
-        
+
         st.markdown(
             f"""
             <div style="
@@ -1023,7 +1028,6 @@ def show_core_analysis():
                 💡 <strong>Key Insight:</strong> Even within the same CGPA (3.5), study hours vary widely — 
                 from {min_hours:.0f} to {max_hours:.0f} hours/week (a {max_hours-min_hours:.0f}-hour range). 
                 This reinforces that <strong>study quality matters more than quantity</strong>.
-                Students achieving the same grades use very different amounts of study time.
                 <br><br>
                 📊 <strong>Statistical Note:</strong> The standard deviation of {std_hours:.0f} hours indicates 
                 substantial variability in study habits among students with identical academic performance.
@@ -1031,14 +1035,13 @@ def show_core_analysis():
             """,
             unsafe_allow_html=True,
         )
-        
         st.markdown("</div>", unsafe_allow_html=True)
-    
+
     # Insight Callout
     st.markdown(
         """
         <div style="
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(249, 115, 22, 0.08) 100%);
+            background: linear-gradient(135deg, rgba(239,68,68,0.08) 0%, rgba(249,115,22,0.08) 100%);
             border-left: 4px solid #EF4444;
             border-radius: 20px;
             padding: 2rem;
@@ -1050,7 +1053,9 @@ def show_core_analysis():
                 The Data Speaks: Study Duration ≠ Better Grades
             </p>
             <p style="font-size: 1rem; color: #374151; margin-bottom: 0.75rem;">
-                With a correlation of just 0.12, study hours alone are <span style="font-weight: 700; color: #DC2626;">not a reliable predictor</span> of academic success.
+                With a correlation of just 0.12, study hours alone are 
+                <span style="font-weight: 700; color: #DC2626;">not a reliable predictor</span> 
+                of academic success.
             </p>
             <p style="font-size: 0.9rem; color: #6b7280;">
                 This raises an important question...
@@ -1059,14 +1064,13 @@ def show_core_analysis():
         """,
         unsafe_allow_html=True,
     )
-    
-    # Transition Question
+
     st.markdown(
         """
         <div style="
             background: white;
             border-radius: 24px;
-            border: 2px solid rgba(123, 104, 200, 0.3);
+            border: 2px solid rgba(123,104,200,0.3);
             padding: 2rem;
             text-align: center;
             margin: 0 auto 2rem auto;
@@ -1075,7 +1079,7 @@ def show_core_analysis():
             <div style="
                 display: inline-block;
                 padding: 0.75rem;
-                background: linear-gradient(135deg, rgba(123, 104, 200, 0.2) 0%, rgba(236, 72, 153, 0.15) 100%);
+                background: linear-gradient(135deg, rgba(123,104,200,0.2) 0%, rgba(236,72,153,0.15) 100%);
                 border-radius: 9999px;
                 margin-bottom: 1rem;
             ">
@@ -1087,22 +1091,24 @@ def show_core_analysis():
                 What Other Factors Can Contribute to Academic Performance?
             </h2>
             <p style="font-size: 1rem; color: #6b7280; margin-bottom: 1.5rem;">
-                Let's explore a comprehensive analysis of behavioral patterns, study methods, and lifestyle choices across 6 key dimensions.
+                Let's explore a comprehensive analysis of behavioral patterns, study methods, 
+                and lifestyle choices across 6 key dimensions.
             </p>
             <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: #7B68C8;">
-                <span style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Dive into the insights</span>
-                <div style="display: flex; flex-direction: column; gap: 0.125rem;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: bounce 1s infinite;">
-                        <path d="M12 5v14M19 12l-7 7-7-7" />
-                    </svg>
-                </div>
+                <span style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                    Dive into the insights
+                </span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     style="animation: bounce 1s infinite;">
+                    <path d="M12 5v14M19 12l-7 7-7-7" />
+                </svg>
             </div>
         </div>
-        
+
         <style>
             @keyframes bounce {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(5px); }
+                0%, 100% {{ transform: translateY(0); }}
+                50%        {{ transform: translateY(5px); }}
             }
         </style>
         """,
