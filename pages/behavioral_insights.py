@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 # -------------------------
 def load_css():
     base_path = os.path.dirname(os.path.dirname(__file__))
-    css_path = os.path.join(base_path, "style", "custom.css")
+    css_path = os.path.join(base_path, "style", "behavioral.css")
 
     try:
         with open(css_path, "r", encoding="utf-8") as f:
