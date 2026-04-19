@@ -307,6 +307,6 @@ left_empty, center_col, right_empty = st.columns([1, 2, 1])
 with center_col:
     # Hidden button for navigation trigger
     if st.button(":material/analytics: Go to Core Analysis", key="hidden_nav_btn", 
-                 type="primary", use_container_width=True, help="Navigate to detailed analysis"):
+                 type="primary", use_container_width=True, help="Navigate to core analysis"):
         st.switch_page("pages/1_core_analysis.py")
 st.markdown('</div>', unsafe_allow_html=True)  # Close intro section

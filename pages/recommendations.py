@@ -95,7 +95,7 @@ def show_recommendations():
         '<div style="margin: 1rem 0 1.5rem 0;">'
         '<div style="display: flex; align-items: center; gap: 0.8rem;">'
         '<div style="width: 4px; height: 40px; background: linear-gradient(180deg, #7c3aed, #ec4899); border-radius: 4px;"></div>'
-        '<h2 style="font-size: 1.8rem; font-weight: 900; margin: 0; letter-spacing: -0.02em;">3 Evidence-Backed Strategies</h2>'
+        '<h2 style="font-size: 2rem; font-weight: 900; margin: 0; letter-spacing: -0.02em;">3 Evidence-Backed Strategies</h2>'
         '</div>'
         '<p style="font-size: 0.95rem; color: #6b7280; margin: 0.5rem 0 0 0.9rem;">Supported by peer-reviewed research beyond this dataset</p>'
         '</div>'
@@ -175,14 +175,14 @@ def show_recommendations():
         The students in this dataset who performed best were not necessarily the ones who studied the most. They were the ones who used smarter methods, started earlier, and kept procrastination from spiralling.
         </p>
         <div style="display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem;">
-            <span style="padding: 0.3rem 1rem; background: rgba(255,255,255,0.15);color: white; border-radius: 40px;">Quality over Quantity</span>
-            <span style="padding: 0.3rem 1rem; background: rgba(255,255,255,0.15); color: white; border-radius: 40px;">Start Early</span>
-            <span style="padding: 0.3rem 1rem; background: rgba(255,255,255,0.15); color: white; border-radius: 40px;">Active > Passive</span>
+            <span style="padding: 0.3rem 1rem; background: rgba(255,255,255,0.15);color: white; border-radius: 40px;">🎯 Quality over Quantity</span>
+            <span style="padding: 0.3rem 1rem; background: rgba(255,255,255,0.15); color: white; border-radius: 40px;">⏰ Start Early</span>
+            <span style="padding: 0.3rem 1rem; background: rgba(255,255,255,0.15); color: white; border-radius: 40px;">📚 Active > Passive</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # ── References ────────────────────────────────────────────────────────────
+        # ── References ────────────────────────────────────────────────────────────
     html(
         '<div class="references-box">'
         '<div class="references-title">References</div>'
