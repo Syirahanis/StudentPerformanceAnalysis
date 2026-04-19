@@ -64,6 +64,28 @@ def apply_chart_style(fig, height=320):
     )
     return fig
 
+
+def toggle_interpretation(key):
+    """Toggle function for interpretation visibility"""
+    if key not in st.session_state:
+        st.session_state[key] = False
+    st.session_state[key] = not st.session_state[key]
+
+
+def render_interpretation_button(key, button_text="📊 Show Interpretation"):
+    """Render a button that toggles interpretation visibility"""
+    if st.button(button_text, key=f"btn_{key}", use_container_width=True):
+        toggle_interpretation(key)
+
+
+def render_interpretation_content(key, content_html):
+    """Render the interpretation content if toggled on"""
+    if st.session_state.get(key, False):
+        st.markdown(content_html, unsafe_allow_html=True)
+        if st.button("Hide Interpretation", key=f"hide_{key}", use_container_width=True):
+            toggle_interpretation(key)
+
+
 # -----------------------------------------------
 # Chart 1 — Stress Start vs End
 # -----------------------------------------------
@@ -108,8 +130,11 @@ def stress_start_end_chart(df):
 
         st.plotly_chart(fig, use_container_width=True, key="stress_start_end")
 
-        st.markdown(
-            f'''
+        # Collapsible interpretation
+        interpretation_key = "insight_stress_start_end"
+        render_interpretation_button(interpretation_key)
+        
+        interpretation_html = f'''
             <div class="group-insight insight-teal">
                 <div class="insight-icon">📊</div>
                 <div class="insight-content">
@@ -131,9 +156,8 @@ def stress_start_end_chart(df):
                     </div>
                 </div>
             </div>
-            ''',
-            unsafe_allow_html=True,
-        )
+        '''
+        render_interpretation_content(interpretation_key, interpretation_html)
 
 
 # -----------------------------------------------
@@ -203,8 +227,11 @@ def stress_vs_procrastination_chart(df):
 
         st.plotly_chart(fig, use_container_width=True, key="stress_procrastination")
 
-        st.markdown(
-            f'''
+        # Collapsible interpretation
+        interpretation_key = "insight_stress_procrastination"
+        render_interpretation_button(interpretation_key)
+        
+        interpretation_html = f'''
             <div class="group-insight insight-orange">
                 <div class="insight-icon">⚠️</div>
                 <div class="insight-content">
@@ -228,9 +255,9 @@ def stress_vs_procrastination_chart(df):
                     </div>
                 </div>
             </div>
-            ''',
-            unsafe_allow_html=True,
-        )
+        '''
+        render_interpretation_content(interpretation_key, interpretation_html)
+
 
 # -----------------------------------------------
 # Chart 3 — Study Hours Per Day vs Stress
@@ -312,8 +339,11 @@ def study_hours_vs_stress_chart(df):
 
         st.plotly_chart(fig, use_container_width=True, key="study_hours_vs_stress")
 
-        st.markdown(
-            '''
+        # Collapsible interpretation
+        interpretation_key = "insight_study_hours"
+        render_interpretation_button(interpretation_key)
+        
+        interpretation_html = '''
             <div class="group-insight insight-purple">
                 <div class="insight-icon">📚</div>
                 <div class="insight-content">
@@ -330,9 +360,9 @@ def study_hours_vs_stress_chart(df):
                     </div>
                 </div>
             </div>
-            ''',
-            unsafe_allow_html=True,
-        )
+        '''
+        render_interpretation_content(interpretation_key, interpretation_html)
+
 
 # -----------------------------------------------
 # Chart 4 — Stress Comparison (Beginning vs End) by CGPA
@@ -416,8 +446,11 @@ def stress_vs_cgpa_chart(df):
 
         st.plotly_chart(fig, use_container_width=True, key="stress_vs_cgpa")
 
-        st.markdown(
-            f'''
+        # Collapsible interpretation
+        interpretation_key = "insight_stress_cgpa"
+        render_interpretation_button(interpretation_key)
+        
+        interpretation_html = f'''
             <div class="group-insight insight-blue">
                 <div class="insight-icon">📊</div>
                 <div class="insight-content">
@@ -433,9 +466,8 @@ def stress_vs_cgpa_chart(df):
                     </div>
                 </div>
             </div>
-            ''',
-            unsafe_allow_html=True,
-        )
+        '''
+        render_interpretation_content(interpretation_key, interpretation_html)
 
 
 # -----------------------------------------------
@@ -607,23 +639,29 @@ def study_method_vs_cgpa_chart(df):
 
         st.plotly_chart(fig, use_container_width=True, key="study_method_treemap")
 
-        st.markdown(f'''
-        <div class="group-insight insight-purple">
-            <div class="insight-icon">🎯</div>
-            <div class="insight-content">
-                <div class="insight-title">PERFORMANCE IMPACT</div>
-                <div class="insight-text">
-                    High-performing students (CGPA 3.0–4.0) predominantly rely on <strong>active study strategies, with summarizing/making notes and practicing questions</strong> emerging as the most common approaches.<br><br>
-                    However, practice questions alone may not be sufficient. While the only failing student relies entirely on practice (based on a very small sample), higher-performing groups show a stronger emphasis on summarizing, particularly among excellent students (CGPA 4.0).<br><br>
-                    From another perspective, these active methods are also most frequently associated with higher CGPA groups, indicating a consistent relationship between study approach and academic performance.
-                </div>
-                <div class="insight-title">OVERALL TAKEAWAY:</div>
-                <div class="insight-text">
-                    Students who engage in <strong>active learning methods</strong> tend to achieve better academic outcomes, suggesting that <strong>how you study may matter more than simply how much you study</strong>.
+        # Collapsible interpretation
+        interpretation_key = "insight_treemap"
+        render_interpretation_button(interpretation_key)
+        
+        interpretation_html = f'''
+            <div class="group-insight insight-purple">
+                <div class="insight-icon">🎯</div>
+                <div class="insight-content">
+                    <div class="insight-title">PERFORMANCE IMPACT</div>
+                    <div class="insight-text">
+                        High-performing students (CGPA 3.0–4.0) predominantly rely on <strong>active study strategies, with summarizing/making notes and practicing questions</strong> emerging as the most common approaches.<br><br>
+                        However, practice questions alone may not be sufficient. While the only failing student relies entirely on practice (based on a very small sample), higher-performing groups show a stronger emphasis on summarizing, particularly among excellent students (CGPA 4.0).<br><br>
+                        From another perspective, these active methods are also most frequently associated with higher CGPA groups, indicating a consistent relationship between study approach and academic performance.
+                    </div>
+                    <div class="insight-title">OVERALL TAKEAWAY:</div>
+                    <div class="insight-text">
+                        Students who engage in <strong>active learning methods</strong> tend to achieve better academic outcomes, suggesting that <strong>how you study may matter more than simply how much you study</strong>.
+                    </div>
                 </div>
             </div>
-        </div>
-        ''', unsafe_allow_html=True)
+        '''
+        render_interpretation_content(interpretation_key, interpretation_html)
+
 
 # -----------------------------------------------
 # Chart 6 — Procrastination Penalty (Red Theme)
@@ -679,7 +717,6 @@ def procrastination_vs_cgpa_chart(df):
     total_students = len(df)
     pct_at_3_4 = (level_3_4_total / total_students) * 100 if total_students > 0 else 0
 
-    # CGPA 1.0 students at level 5
     level5_cgpa1 = len(df[(df['procrastination_level'] == 5) & (df['cgpa'] < 2.3)])
     cgpa1_total = len(df[df['cgpa'] < 2.3])
     pct_cgpa1_at_level5 = (level5_cgpa1 / cgpa1_total) * 100 if cgpa1_total > 0 else 0
@@ -728,27 +765,45 @@ def procrastination_vs_cgpa_chart(df):
 
         st.plotly_chart(fig, use_container_width=True, key="procrastination_cgpa_distribution")
 
-        st.markdown(f'''
-        <div class="group-insight insight-red">
-            <div class="insight-icon">🎯</div>
-            <div class="insight-content">
-                <div class="insight-title">PROCRASTINATION PATTERNS</div>
-                <div class="insight-text">
-                    Most students in the <strong>Good (CGPA 3.00–3.99)</strong> group are concentrated at procrastination levels 3 and 4, suggesting that moderate procrastination is common among higher-performing students.<br><br>
-                    Although some students still achieve good results at high procrastination levels (level 5), these cases are less dominant compared to moderate levels, indicating that extreme procrastination is less typical among stronger academic performers. This pattern suggests that successful students do not necessarily eliminate procrastination; instead, they tend to manage it at moderate levels rather than allowing it to become extreme.
-                </div>
-                <div class="insight-title">OVERALL TAKEAWAY:</div>
-                <div class="insight-text">
-                    There is a <strong>possible association between procrastination level and academic performance</strong>, where <strong>extreme procrastination is less common among higher-performing students</strong>.
+        # Collapsible interpretation
+        interpretation_key = "insight_procrastination"
+        render_interpretation_button(interpretation_key)
+        
+        interpretation_html = f'''
+            <div class="group-insight insight-red">
+                <div class="insight-icon">🎯</div>
+                <div class="insight-content">
+                    <div class="insight-title">PROCRASTINATION PATTERNS</div>
+                    <div class="insight-text">
+                        Most students in the <strong>Good (CGPA 3.00–3.99)</strong> group are concentrated at procrastination levels 3 and 4, suggesting that moderate procrastination is common among higher-performing students.<br><br>
+                        Although some students still achieve good results at high procrastination levels (level 5), these cases are less dominant compared to moderate levels, indicating that extreme procrastination is less typical among stronger academic performers. This pattern suggests that successful students do not necessarily eliminate procrastination; instead, they tend to manage it at moderate levels rather than allowing it to become extreme.
+                    </div>
+                    <div class="insight-title">OVERALL TAKEAWAY:</div>
+                    <div class="insight-text">
+                        There is a <strong>possible association between procrastination level and academic performance</strong>, where <strong>extreme procrastination is less common among higher-performing students</strong>.
+                    </div>
                 </div>
             </div>
-        </div>
-        ''', unsafe_allow_html=True)
+        '''
+        render_interpretation_content(interpretation_key, interpretation_html)
 
 
 def show_behavioral_insights():
     load_css()
     df = load_data()
+
+    # Initialize session state for all interpretations if not exists
+    interpretation_keys = [
+        "insight_stress_start_end",
+        "insight_stress_procrastination",
+        "insight_study_hours",
+        "insight_stress_cgpa",
+        "insight_treemap",
+        "insight_procrastination"
+    ]
+    for key in interpretation_keys:
+        if key not in st.session_state:
+            st.session_state[key] = False
 
     # =========================
     # PAGE TITLE
@@ -798,16 +853,13 @@ def show_behavioral_insights():
     procrastination_vs_cgpa_chart(df)
 
     # ==================== FIXED HIGHLIGHT BANNER ====================
-    # Define CSS as a raw string to avoid escaping issues
     banner_css = r"""
     <style>
     .highlight-banner {
         display: block;
-        width: fit-content;        /* KEY: shrink to content */
-        margin: 2rem auto;         /* center it */
-
+        width: fit-content;
+        margin: 2rem auto;
         padding: 1.2rem 1.6rem;
-
         background: linear-gradient(135deg, #faf5ff, #f3e8ff);
         border-radius: 16px;
         box-shadow: 0 10px 25px rgba(124, 58, 237, 0.08);
@@ -881,7 +933,6 @@ def show_behavioral_insights():
     </style>
     """
     
-    # Define HTML as a separate string
     banner_html = """
     <div class="highlight-banner">
         <div class="highlight-card-inner">
@@ -917,7 +968,6 @@ def show_behavioral_insights():
     </div>
     """
     
-    # Render CSS and HTML separately
     st.markdown(banner_css, unsafe_allow_html=True)
     st.markdown(banner_html, unsafe_allow_html=True)
 
