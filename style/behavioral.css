@@ -236,24 +236,107 @@ div[data-testid="stPlotlyChart"] {
 }
 
 /* ==================== HIGHLIGHT BANNER ==================== */
+/* ==================== HIGHLIGHT BANNER (Redesigned for your theme) ==================== */
+/* ==================== HIGHLIGHT BANNER (Narrative/Minimalist Style) ==================== */
 .highlight-banner {
-    background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 100%);
-    border-radius: 20px;
+    background: transparent;
     padding: 1.5rem;
     margin-top: 2rem;
-}
-
-.highlight-banner h3 {
-    font-size: 1.2rem;
     margin-bottom: 1rem;
-    color: white;
+    text-align: center;
 }
 
-.highlight-banner p {
-    color: #c4b5fd;
-    font-size: 0.85rem;
-    margin: 0.4rem 0;
-    padding-left: 0.5rem;
+/* Decorative divider (matching your narrative-bridge style) */
+.highlight-banner .banner-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.highlight-banner .divider-line {
+    height: 1px;
+    width: 3rem;
+    background: linear-gradient(90deg, transparent, #c084fc);
+}
+
+.highlight-banner .divider-line-right {
+    background: linear-gradient(270deg, transparent, #c084fc);
+}
+
+.highlight-banner .divider-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: #a855f7;
+}
+
+/* Main heading */
+.highlight-banner h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #6b21a5;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+}
+
+/* List container */
+.highlight-banner .takeaway-list {
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+/* Each takeaway item */
+.highlight-banner .takeaway-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin: 1rem 0;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.highlight-banner .takeaway-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
+.highlight-banner .takeaway-text {
+    color: #334155;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.highlight-banner .takeaway-text strong {
+    color: #7c3aed;
+    font-weight: 600;
+}
+
+/* Optional hover effect */
+.highlight-banner .takeaway-item:hover {
+    border-bottom-color: rgba(139, 92, 246, 0.3);
+    transition: border-bottom-color 0.2s ease;
+}
+
+@media (max-width: 640px) {
+    .highlight-banner {
+        padding: 1.2rem;
+        border-radius: 20px;
+    }
+    
+    .highlight-banner h3 {
+        font-size: 1.2rem;
+    }
+    
+    .highlight-banner p {
+        font-size: 0.8rem;
+        padding-left: 0.75rem;
+    }
 }
 
 /* ==================== INTRO PAGE STYLES ==================== */

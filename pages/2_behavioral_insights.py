@@ -233,10 +233,9 @@ def stress_vs_procrastination_chart(df):
         )
 
 # -----------------------------------------------
-# Chart 4 — Study Hours Per Day vs Stress
+# Chart 3 — Study Hours Per Day vs Stress
 # -----------------------------------------------
 def study_hours_vs_stress_chart(df):
-    # Create study hours categories
     def categorize_hours(hours):
         if hours <= 2:
             return "Low (0-2 hours)"
@@ -246,11 +245,10 @@ def study_hours_vs_stress_chart(df):
             return "High (5-6 hours)"
         else:
             return "Very High (7+ hours)"
-    
+
     df_copy = df.copy()
     df_copy["study_category"] = df_copy["study_hours_before_exam"].apply(categorize_hours)
-    
-    # Calculate average stress by study hours category
+
     summary = (
         df_copy.groupby("study_category", as_index=False)
         .agg(
@@ -259,15 +257,13 @@ def study_hours_vs_stress_chart(df):
             student_count=("study_category", "size")
         )
     )
-    
-    # Define order for categories
+
     category_order = ["Low (0-2 hours)", "Moderate (3-4 hours)", "High (5-6 hours)", "Very High (7+ hours)"]
     summary["study_category"] = pd.Categorical(summary["study_category"], categories=category_order, ordered=True)
     summary = summary.sort_values("study_category")
-    
+
     fig = go.Figure()
-    
-    # Add traces for beginning and end stress
+
     fig.add_trace(
         go.Bar(
             x=summary["study_category"],
@@ -279,7 +275,7 @@ def study_hours_vs_stress_chart(df):
             hovertemplate="<b>Study Hours:</b> %{x}<br><b>Beginning Stress:</b> %{y:.2f}<extra></extra>",
         )
     )
-    
+
     fig.add_trace(
         go.Bar(
             x=summary["study_category"],
@@ -291,7 +287,7 @@ def study_hours_vs_stress_chart(df):
             hovertemplate="<b>Study Hours:</b> %{x}<br><b>End Stress:</b> %{y:.2f}<extra></extra>",
         )
     )
-    
+
     fig.update_layout(
         barmode="group",
         yaxis=dict(title="Average Stress Level", range=[0, 5.5]),
@@ -299,23 +295,23 @@ def study_hours_vs_stress_chart(df):
         legend=dict(orientation="h", y=1.10, x=0),
     )
     fig = apply_chart_style(fig, height=320)
-    
+
     with st.container():
         st.markdown(
             '''
             <div class="chart-group card-purple">
                 <div class="group-header">
                     <div class="group-kicker">STUDY HABITS ANALYSIS</div>
-                    <h3 class="group-title">Stress Levels vs  Daily Study Hours</h3>
+                    <h3 class="group-title">Stress Levels vs Daily Study Hours</h3>
                     <p class="group-subtitle">Comparing stress levels across different daily study durations.</p>
                 </div>
             </div>
             ''',
             unsafe_allow_html=True,
         )
-        
+
         st.plotly_chart(fig, use_container_width=True, key="study_hours_vs_stress")
-        
+
         st.markdown(
             '''
             <div class="group-insight insight-purple">
@@ -323,14 +319,14 @@ def study_hours_vs_stress_chart(df):
                 <div class="insight-content">
                     <div class="insight-title">KEY INSIGHT</div>
                     <div class="insight-text">
-                         Longer daily study hours appear to reflect academic pressure rather 
-                         than guarantee stronger academic outcomes. This suggests that increasing study time alone is not enough; 
-                         how students manage their workload matters more.
+                        Longer daily study hours appear to reflect academic pressure rather
+                        than guarantee stronger academic outcomes. This suggests that increasing study time alone is not enough;
+                        how students manage their workload matters more.
                     </div>
                     <div class="insight-title">OVERALL TAKEAWAY:</div>
                     <div class="insight-text">
-                       <strong>Study intensity appears to be linked with higher stress levels,</strong> but this relationship likely reflects academic pressure 
-            rather than study hours alone. Managing workload early and maintaining consistent study habits may help reduce stress buildup.
+                        <strong>Study intensity appears to be linked with higher stress levels,</strong> but this relationship likely reflects academic pressure
+                        rather than study hours alone. Managing workload early and maintaining consistent study habits may help reduce stress buildup.
                     </div>
                 </div>
             </div>
@@ -342,7 +338,6 @@ def study_hours_vs_stress_chart(df):
 # Chart 4 — Stress Comparison (Beginning vs End) by CGPA
 # -----------------------------------------------
 def stress_vs_cgpa_chart(df):
-    # Create CGPA groups based on your ratios
     def get_cgpa_group(cgpa):
         if cgpa < 2.00:
             return "Below 2.00"
@@ -352,11 +347,10 @@ def stress_vs_cgpa_chart(df):
             return "3.00 - 3.99"
         else:
             return "4.00"
-    
+
     df_copy = df.copy()
     df_copy["cgpa_group"] = df_copy["cgpa"].apply(get_cgpa_group)
-    
-    # Calculate stress metrics by CGPA group
+
     summary = (
         df_copy.groupby("cgpa_group", as_index=False)
         .agg(
@@ -365,18 +359,15 @@ def stress_vs_cgpa_chart(df):
             student_count=("cgpa_group", "size")
         )
     )
-    
-    # Calculate stress difference
+
     summary["stress_difference"] = summary["avg_stress_end"] - summary["avg_stress_start"]
-    
-    # Define order for CGPA groups
+
     group_order = ["Below 2.00", "2.00 - 2.99", "3.00 - 3.99", "4.00"]
     summary["cgpa_group"] = pd.Categorical(summary["cgpa_group"], categories=group_order, ordered=True)
     summary = summary.sort_values("cgpa_group")
-    
+
     fig = go.Figure()
-    
-    # Add bars for beginning stress
+
     fig.add_trace(
         go.Bar(
             name="Beginning of Semester",
@@ -388,8 +379,7 @@ def stress_vs_cgpa_chart(df):
             hovertemplate="<b>CGPA Group:</b> %{x}<br><b>Beginning Stress:</b> %{y:.2f}<extra></extra>",
         )
     )
-    
-    # Add bars for end stress
+
     fig.add_trace(
         go.Bar(
             name="End of Semester",
@@ -401,7 +391,7 @@ def stress_vs_cgpa_chart(df):
             hovertemplate="<b>CGPA Group:</b> %{x}<br><b>End Stress:</b> %{y:.2f}<extra></extra>",
         )
     )
-    
+
     fig.update_layout(
         barmode="group",
         yaxis=dict(title="Average Stress Level", range=[0, 5.5]),
@@ -409,7 +399,7 @@ def stress_vs_cgpa_chart(df):
         legend=dict(orientation="h", y=1.10, x=0),
     )
     fig = apply_chart_style(fig, height=320)
-    
+
     with st.container():
         st.markdown(
             '''
@@ -423,18 +413,9 @@ def stress_vs_cgpa_chart(df):
             ''',
             unsafe_allow_html=True,
         )
-        
+
         st.plotly_chart(fig, use_container_width=True, key="stress_vs_cgpa")
-        
-        # Calculate insights
-        below_2_start = summary[summary["cgpa_group"] == "Below 2.00"]["avg_stress_start"].values[0] if len(summary[summary["cgpa_group"] == "Below 2.00"]) > 0 else 0
-        below_2_end = summary[summary["cgpa_group"] == "Below 2.00"]["avg_stress_end"].values[0] if len(summary[summary["cgpa_group"] == "Below 2.00"]) > 0 else 0
-        below_2_diff = below_2_end - below_2_start
-        
-        cgpa_4_start = summary[summary["cgpa_group"] == "4.00"]["avg_stress_start"].values[0] if len(summary[summary["cgpa_group"] == "4.00"]) > 0 else 0
-        cgpa_4_end = summary[summary["cgpa_group"] == "4.00"]["avg_stress_end"].values[0] if len(summary[summary["cgpa_group"] == "4.00"]) > 0 else 0
-        cgpa_4_diff = cgpa_4_end - cgpa_4_start
-        
+
         st.markdown(
             f'''
             <div class="group-insight insight-blue">
@@ -442,23 +423,23 @@ def stress_vs_cgpa_chart(df):
                 <div class="insight-content">
                     <div class="insight-title">KEY INSIGHT</div>
                     <div class="insight-text">
-                    Stress increases across all CGPA groups,
-                    but the pattern is not the same for every student. 
-                    <strong>Mid-performing students show the sharpest rise, while top-performing students appear to maintain more stable stress levels.</strong>
+                        Stress increases across all CGPA groups,
+                        but the pattern is not the same for every student.
+                        <strong>Mid-performing students show the sharpest rise, while top-performing students appear to maintain more stable stress levels.</strong>
                     </div>
                     <div class="insight-title">OVERALL TAKEAWAY:</div>
                     <div class="insight-text">
-                        This suggests that academic performance may depend not only on pressure itself, but also on how students manage it
+                        This suggests that academic performance may depend not only on pressure itself, but also on how students manage it.
                     </div>
                 </div>
             </div>
             ''',
             unsafe_allow_html=True,
         )
-        
-        
+
+
 # -----------------------------------------------
-# Chart 5— Study Method Treemap (Purple Theme)
+# Chart 5 — Study Method Treemap (Purple Theme)
 # -----------------------------------------------
 def study_method_vs_cgpa_chart(df):
     import plotly.express as px
@@ -478,22 +459,20 @@ def study_method_vs_cgpa_chart(df):
     }
 
     method_colors = {
-        "Practice Questions":  "#C4B5FD",  # Pastel lavender-purple
-        "Summarizing / Notes": "#BFDBFE",  # Pastel blue
-        "Reading Notes":       "#A7F3D0",  # Pastel mint green
-        "Watching Videos":     "#FDE68A",  # Pastel amber/yellow
-        "AI Quiz Game":        "#FBCFE8",  # Pastel pink
+        "Practice Questions":  "#C4B5FD",
+        "Summarizing / Notes": "#BFDBFE",
+        "Reading Notes":       "#A7F3D0",
+        "Watching Videos":     "#FDE68A",
+        "AI Quiz Game":        "#FBCFE8",
     }
 
-    # Updated CGPA mapping with group names
     cgpa_label_map = {
-        1.0: "Failing (CGPA < 2.00)", 
-        2.5: "Satisfactory (CGPA 2.00 - 2.99)", 
-        3.5: "Good (CGPA 3.00 - 3.99)", 
+        1.0: "Failing (CGPA < 2.00)",
+        2.5: "Satisfactory (CGPA 2.00 - 2.99)",
+        3.5: "Good (CGPA 3.00 - 3.99)",
         4.0: "Excellent (CGPA 4.00)"
     }
-    
-    # CGPA group display names
+
     cgpa_group_names = {
         "Excellent (CGPA 4.00)": "Excellent (CGPA 4.00)",
         "Good (CGPA 3.00 - 3.99)": "Good (CGPA 3.00 - 3.99)",
@@ -506,8 +485,7 @@ def study_method_vs_cgpa_chart(df):
     plot_df["cgpa_label"] = plot_df["cgpa"].map(cgpa_label_map).fillna("Other")
     plot_df["color_val"] = plot_df["method_clean"].map(method_colors).fillna("#9A9890")
 
-    # CGPA filter via radio
-    cgpa_options = ["All CGPA", "Excellent (CGPA 4.00)", "Good (CGPA 3.00 - 3.99)", "Satisfactory (CGPA 2.00 - 2.99)","Failing (CGPA < 2.00)"]
+    cgpa_options = ["All CGPA", "Excellent (CGPA 4.00)", "Good (CGPA 3.00 - 3.99)", "Satisfactory (CGPA 2.00 - 2.99)", "Failing (CGPA < 2.00)"]
     selected_cgpa = st.radio(
         "Filter by CGPA group:",
         cgpa_options,
@@ -532,17 +510,14 @@ def study_method_vs_cgpa_chart(df):
     )
     grouped["color_val"] = grouped["method_clean"].map(method_colors).fillna("#9A9890")
 
-    # Build treemap using graph_objects for full color control
     if selected_cgpa == "All CGPA":
-        # labels = methods + cgpa sub-nodes + root
         methods_unique = list(method_colors.keys())
         labels, parents, values, colors_list, hover_texts = [], [], [], [], []
 
-        # root - changed to grey
         labels.append("All Students")
         parents.append("")
         values.append(len(filtered_df))
-        colors_list.append("#D1D5DB")  # Warm light grey  # Soft grey instead of purple
+        colors_list.append("#D1D5DB")
         hover_texts.append(f"Total: {len(filtered_df)} students")
 
         for method in methods_unique:
@@ -557,7 +532,6 @@ def study_method_vs_cgpa_chart(df):
             hover_texts.append(f"{method}<br>{total_m} students")
 
             for _, row in m_df.iterrows():
-                # Use CGPA group name instead of raw label
                 cgpa_display = cgpa_group_names.get(row['cgpa_label'], row['cgpa_label'])
                 node_label = f"{method} — {cgpa_display}"
                 labels.append(node_label)
@@ -574,24 +548,21 @@ def study_method_vs_cgpa_chart(df):
             hovertext=hover_texts,
             hoverinfo="text",
             texttemplate="<b>%{label}</b><br>%{value} students",
-            textfont=dict(size=14, color="black"),  # Larger font (14) and black color
+            textfont=dict(size=14, color="black"),
             root_color="#f8f0ff",
             branchvalues="total",
         ))
     else:
-        # Get the display name for the selected CGPA group
         selected_cgpa_display = cgpa_group_names.get(selected_cgpa, selected_cgpa)
-        
-        # Flat treemap for single CGPA
+
         m_counts = (
             filtered_df.groupby("method_clean").size().reset_index(name="count")
         )
-        
-        # Replace "Selected Group" with the actual CGPA group name
+
         labels = [selected_cgpa_display] + m_counts["method_clean"].tolist()
         parents = [""] + [selected_cgpa_display] * len(m_counts)
         values = [m_counts["count"].sum()] + m_counts["count"].tolist()
-        colors_list = ["#9CA3AF"] + [method_colors.get(m, "#9A9890") for m in m_counts["method_clean"]]  # Grey root
+        colors_list = ["#9CA3AF"] + [method_colors.get(m, "#9A9890") for m in m_counts["method_clean"]]
         hover_texts = [f"Total {selected_cgpa_display}: {m_counts['count'].sum()} students"] + [
             f"{row['method_clean']}<br>{row['count']} students" for _, row in m_counts.iterrows()
         ]
@@ -604,25 +575,24 @@ def study_method_vs_cgpa_chart(df):
             hovertext=hover_texts,
             hoverinfo="text",
             texttemplate="<b>%{label}</b><br>%{value} students",
-            textfont=dict(size=14, color="black"),  # Larger font (14) and black color
+            textfont=dict(size=14, color="black"),
             root_color="#f8f0ff",
             branchvalues="total",
         ))
 
     fig.update_layout(
-        height=400,  # Increased height for better visibility when full width
+        height=400,
         margin=dict(l=10, r=10, t=10, b=10),
         paper_bgcolor="white",
         plot_bgcolor="white",
     )
 
-    # Compute insight stat
     ct = pd.crosstab(plot_df["cgpa_label"], plot_df["method_clean"])
     ct_pct = ct.div(ct.sum(axis=1), axis=0) * 100
     active_cols = [c for c in ["Practice Questions", "Summarizing / Notes"] if c in ct_pct.columns]
     active_pct = ct_pct[active_cols].sum(axis=1)
-    high_cgpa_active = active_pct.get("Excellent (4.00)", 0)
-    low_cgpa_active = active_pct.get("Failing (< 2.00)", 0)
+    high_cgpa_active = active_pct.get("Excellent (CGPA 4.00)", 0)
+    low_cgpa_active = active_pct.get("Failing (CGPA < 2.00)", 0)
 
     with st.container():
         st.markdown('''
@@ -630,7 +600,7 @@ def study_method_vs_cgpa_chart(df):
             <div class="group-header">
                 <div class="group-kicker">INTERACTIVE TREEMAP</div>
                 <h3 class="group-title">Study Method by CGPA Group</h3>
-                <p class="group-subtitle">Click a CGPA group below to explore study method distribution. Larger tiles = more students.</p>
+                <p class="group-subtitle">Click a CGPA group above to explore study method distribution. Larger tiles = more students.</p>
             </div>
         </div>
         ''', unsafe_allow_html=True)
@@ -645,10 +615,10 @@ def study_method_vs_cgpa_chart(df):
                 <div class="insight-text">
                     High-performing students (CGPA 3.0–4.0) predominantly rely on <strong>active study strategies, with summarizing/making notes and practicing questions</strong> emerging as the most common approaches.<br><br>
                     However, practice questions alone may not be sufficient. While the only failing student relies entirely on practice (based on a very small sample), higher-performing groups show a stronger emphasis on summarizing, particularly among excellent students (CGPA 4.0).<br><br>
-                    From another perspective, these active methods are also most frequently associated with higher CGPA groups, indicating a consistent relationship between study approach and academic performance.<br><br>
+                    From another perspective, these active methods are also most frequently associated with higher CGPA groups, indicating a consistent relationship between study approach and academic performance.
                 </div>
                 <div class="insight-title">OVERALL TAKEAWAY:</div>
-                <div class="insight-text"> 
+                <div class="insight-text">
                     Students who engage in <strong>active learning methods</strong> tend to achieve better academic outcomes, suggesting that <strong>how you study may matter more than simply how much you study</strong>.
                 </div>
             </div>
@@ -656,51 +626,40 @@ def study_method_vs_cgpa_chart(df):
         ''', unsafe_allow_html=True)
 
 # -----------------------------------------------
-# Chart 6 — Procrastination Penalty (Red Theme) — Enhanced
+# Chart 6 — Procrastination Penalty (Red Theme)
 # -----------------------------------------------
 def procrastination_vs_cgpa_chart(df):
-    """
-    Grouped bar chart showing distribution of students across procrastination levels
-    for each CGPA group.
-    """
     import plotly.graph_objects as go
     import numpy as np
-    
-    # Define CGPA groups and their display properties
+
     cgpa_groups = [1.0, 2.5, 3.5, 4.0]
     cgpa_labels = ['Failing (CGPA < 2.00)', 'Satisfactory (CGPA 2.00–2.99)', 'Good (CGPA 3.00–3.99)', 'Excellent (CGPA 4.00)']
-    cgpa_colors = ['#f27d72', '#f7c440', '#64c7c8', '#22c55e']  # Coral, Amber, Teal, Green
-    
+    cgpa_colors = ['#f27d72', '#f7c440', '#64c7c8', '#22c55e']
+
     proc_levels = [1, 2, 3, 4, 5]
-    proc_labels = ['Level 1\n(None)', 'Level 2\n(Low)', 'Level 3\n(Moderate)', 'Level 4\n(High)', 'Level 5\n(Severe)']
-    
-    # Calculate counts for each combination
+
     n_proc = len(proc_levels)
     n_groups = len(cgpa_groups)
     bar_width = 0.18
     x = np.arange(n_proc)
-    
-    # Create figure
+
     fig = go.Figure()
-    
-    # Add bars for each CGPA group
+
     for i, (cgpa, label, color) in enumerate(zip(cgpa_groups, cgpa_labels, cgpa_colors)):
         counts = []
         for p in proc_levels:
-            # Handle CGPA matching with tolerance for floating point
             if cgpa == 4.0:
                 mask = (df['cgpa'] >= 3.9) & (df['procrastination_level'] == p)
             elif cgpa == 3.5:
                 mask = (df['cgpa'] >= 3.3) & (df['cgpa'] < 3.9) & (df['procrastination_level'] == p)
             elif cgpa == 2.5:
                 mask = (df['cgpa'] >= 2.3) & (df['cgpa'] < 3.3) & (df['procrastination_level'] == p)
-            else:  # cgpa == 1.0
+            else:
                 mask = (df['cgpa'] < 2.3) & (df['procrastination_level'] == p)
             counts.append(len(df[mask]))
-        
-        # Calculate offset for this group
+
         offset = (i - n_groups / 2 + 0.5) * bar_width
-        
+
         fig.add_trace(go.Bar(
             name=label,
             x=[f'Level {p}' for p in proc_levels],
@@ -714,19 +673,17 @@ def procrastination_vs_cgpa_chart(df):
             legendgroup=label,
             hovertemplate='<b>%{x}</b><br>%{fullData.name}<br>Students: <b>%{y}</b><extra></extra>'
         ))
-    
-    # Calculate total students per procrastination level for insights
+
     total_by_proc = [len(df[df['procrastination_level'] == p]) for p in proc_levels]
-    level_3_4_total = total_by_proc[2] + total_by_proc[3]  # Levels 3 + 4
+    level_3_4_total = total_by_proc[2] + total_by_proc[3]
     total_students = len(df)
     pct_at_3_4 = (level_3_4_total / total_students) * 100 if total_students > 0 else 0
-    
+
     # CGPA 1.0 students at level 5
     level5_cgpa1 = len(df[(df['procrastination_level'] == 5) & (df['cgpa'] < 2.3)])
     cgpa1_total = len(df[df['cgpa'] < 2.3])
     pct_cgpa1_at_level5 = (level5_cgpa1 / cgpa1_total) * 100 if cgpa1_total > 0 else 0
-    
-    # Update layout
+
     fig.update_layout(
         template='plotly_white',
         height=400,
@@ -757,7 +714,7 @@ def procrastination_vs_cgpa_chart(df):
         paper_bgcolor='white',
         plot_bgcolor='white',
     )
-    
+
     with st.container():
         st.markdown('''
         <div class="chart-group card-red">
@@ -768,7 +725,7 @@ def procrastination_vs_cgpa_chart(df):
             </div>
         </div>
         ''', unsafe_allow_html=True)
-        
+
         st.plotly_chart(fig, use_container_width=True, key="procrastination_cgpa_distribution")
 
         st.markdown(f'''
@@ -778,9 +735,10 @@ def procrastination_vs_cgpa_chart(df):
                 <div class="insight-title">PROCRASTINATION PATTERNS</div>
                 <div class="insight-text">
                     Most students in the <strong>Good (CGPA 3.00–3.99)</strong> group are concentrated at procrastination levels 3 and 4, suggesting that moderate procrastination is common among higher-performing students.<br><br>
-                    Although some students still achieve good results at high procrastination levels (level 5), these cases are less dominant compared to moderate levels, indicating that extreme procrastination is less typical among stronger academic performers. This pattern suggests that successful students do not necessarily eliminate procrastination; instead, they tend to manage it at moderate levels rather than allowing it to become extreme.<br><br>
+                    Although some students still achieve good results at high procrastination levels (level 5), these cases are less dominant compared to moderate levels, indicating that extreme procrastination is less typical among stronger academic performers. This pattern suggests that successful students do not necessarily eliminate procrastination; instead, they tend to manage it at moderate levels rather than allowing it to become extreme.
+                </div>
                 <div class="insight-title">OVERALL TAKEAWAY:</div>
-                <div class="insight-text"> 
+                <div class="insight-text">
                     There is a <strong>possible association between procrastination level and academic performance</strong>, where <strong>extreme procrastination is less common among higher-performing students</strong>.
                 </div>
             </div>
@@ -839,27 +797,135 @@ def show_behavioral_insights():
     study_method_vs_cgpa_chart(df)
     procrastination_vs_cgpa_chart(df)
 
+    # ==================== FIXED HIGHLIGHT BANNER ====================
+    # Define CSS as a raw string to avoid escaping issues
+    banner_css = r"""
+    <style>
+    .highlight-banner {
+        display: block;
+        width: fit-content;        /* KEY: shrink to content */
+        margin: 2rem auto;         /* center it */
 
+        padding: 1.2rem 1.6rem;
 
-
-
-    # Summary banner
-    st.markdown('''
+        background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(124, 58, 237, 0.08);
+        border: 1px solid rgba(168, 85, 247, 0.15);
+    }
+    .highlight-banner .banner-divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    .highlight-card-inner {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .highlight-banner .divider-line {
+        height: 1px;
+        width: 3rem;
+        background: linear-gradient(90deg, transparent, #c084fc);
+    }
+    .highlight-banner .divider-line-right {
+        background: linear-gradient(270deg, transparent, #c084fc);
+    }
+    .highlight-banner .divider-dot {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background: #a855f7;
+    }
+    .highlight-banner h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #6b21a5;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 1.5rem;
+    }
+    .highlight-banner .takeaway-list {
+        max-width: 700px;
+        margin: 0 auto;
+        text-align: left;
+    }
+    .highlight-banner .takeaway-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin: 0.75rem 0;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+        transition: border-bottom-color 0.2s ease;
+    }
+    .highlight-banner .takeaway-item:hover {
+        border-bottom-color: rgba(139, 92, 246, 0.3);
+    }
+    .highlight-banner .takeaway-icon {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+    }
+    .highlight-banner .takeaway-text {
+        color: #334155;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        flex: 1;
+    }
+    .highlight-banner .takeaway-text strong {
+        color: #7c3aed;
+        font-weight: 600;
+    }
+    </style>
+    """
+    
+    # Define HTML as a separate string
+    banner_html = """
     <div class="highlight-banner">
-        <h3>📊 Key Takeaways</h3>
-        <p>✅ Study duration shows only a very weak relationship with CGPA</p>
-        <p>✅ Stress increases significantly throughout the semester</p>
-        <p>✅ Procrastination is strongly linked to higher end-of-semester stress</p>
-        <p>✅ Active study methods are more closely associated with stronger academic performance</p>
-        <p>✅ Academic success appears to depend more on study quality, behavior, and stress management than on study hours alone</p>
+        <div class="highlight-card-inner">
+            <div class="banner-divider">
+                <div class="divider-line"></div>
+                <div class="divider-dot"></div>
+                <div class="divider-line divider-line-right"></div>
+            </div>
+            <h3>📊 Key Takeaways</h3>
+            <div class="takeaway-list">
+                <div class="takeaway-item">
+                    <div class="takeaway-icon">📉</div>
+                    <div class="takeaway-text">Study duration shows only a <strong>very weak relationship</strong> with CGPA</div>
+                </div>
+                <div class="takeaway-item">
+                    <div class="takeaway-icon">⚠️</div>
+                    <div class="takeaway-text">Stress levels <strong>increase significantly</strong> throughout the semester</div>
+                </div>
+                <div class="takeaway-item">
+                    <div class="takeaway-icon">⏳</div>
+                    <div class="takeaway-text">Procrastination is <strong>strongly linked</strong> to higher end-of-semester stress</div>
+                </div>
+                <div class="takeaway-item">
+                    <div class="takeaway-icon">🧠</div>
+                    <div class="takeaway-text">Active study methods are <strong>more closely associated</strong> with stronger academic performance</div>
+                </div>
+                <div class="takeaway-item">
+                    <div class="takeaway-icon">🎯</div>
+                    <div class="takeaway-text">Academic success depends more on <strong>study quality, behavior, and stress management</strong> than on study hours alone</div>
+                </div>
+            </div>
+        </div>
     </div>
-    ''', unsafe_allow_html=True)
+    """
+    
+    # Render CSS and HTML separately
+    st.markdown(banner_css, unsafe_allow_html=True)
+    st.markdown(banner_html, unsafe_allow_html=True)
 
     left_empty, center_col, right_empty = st.columns([1, 2, 1])
     with center_col:
-        # Hidden button for navigation trigger
         if st.button(":material/analytics: Go to Recommendations", key="hidden_nav_btn", 
-                    type="primary", use_container_width=True, help="Navigate to detailed analysis"):
-            st.switch_page(("pages/recommendations.py"))
+                    type="primary", use_container_width=True, help="Navigate to the recommendations page with actionable insights based on the analysis."):
+            st.switch_page("pages/recommendations.py")
+
 if __name__ == "__main__":
-            show_behavioral_insights()
+    show_behavioral_insights()
