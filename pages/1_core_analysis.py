@@ -1042,9 +1042,9 @@ def show_core_analysis():
                 The Data Speaks: Study Duration ≠ Better Grades
             </p>
             <p style="font-size: 1rem; color: #374151; margin-bottom: 0.75rem;">
-                The scatter plot shows no clear pattern. Students with higher CGPA are not consistently studying more, and the points are widely spread.
-                Even within the “Good” group(3.00-3.99), study time ranges from 1 to 38 hours, yet the CGPA remains the same.
-                With a correlation of just 0.13, the message is clear: <br><span style="font-weight: 700; color: #DC2626;">more study hours do not guarantee better grades.</span> 
+                The scatter plot reveals that total study hours have only a very weak relationship with CGPA. Students with similar academic performance report widely varying study durations, indicating that time spent studying alone is not a reliable predictor of higher CGPA.
+                <br></br>
+                <span style="font-weight: 700; color: #DC2626;">Study duration alone has very limited power in explaining academic performance.</span>
             </p>
             <p style="font-size: 0.9rem; color: #6b7280;">
                 This raises an important question...
@@ -1080,8 +1080,7 @@ def show_core_analysis():
                 What Other Factors Can Contribute to Academic Performance?
             </h2>
             <p style="font-size: 1rem; color: #6b7280; margin-bottom: 1.5rem;">
-                Let's explore a comprehensive analysis of behavioral patterns, study methods, 
-                and lifestyle choices across 6 key dimensions.
+            Let’s explore the key behavioral and study-related factors that may better explain academic performance
             </p>
             <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: #7B68C8;">
                 <span style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">

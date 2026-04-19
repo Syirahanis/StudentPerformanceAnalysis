@@ -808,3 +808,30 @@ div[data-testid="stPlotlyChart"] {
 [data-testid="column"] {
     gap: 0rem !important;
 }
+
+.group-insight .insight-content {
+    display: block !important;
+    width: 100%;
+}
+
+.group-insight .insight-text {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.8rem;
+}
+
+.group-insight .insight-title {
+    display: block;
+    margin-top: 0.8rem;
+    margin-bottom: 0.3rem;
+}
+
+.insight-text {
+    font-size: 16px;   /* easier to read from far */
+    line-height: 1.8;
+}
+
+.insight-title {
+    font-size: 14px;
+    font-weight: 700;
+}

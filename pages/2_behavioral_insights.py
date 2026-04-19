@@ -38,13 +38,39 @@ def load_data():
     return df
 
 
+def apply_chart_style(fig, height=320):
+    fig.update_layout(
+        template="plotly_white",
+        height=height,
+        margin=dict(l=20, r=20, t=20, b=20),
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        hoverlabel=dict(
+            bgcolor="white",
+            font_size=13,
+            font_color="#1f2937",
+            bordercolor="#d1d5db",
+        ),
+        xaxis=dict(
+            tickfont=dict(size=11, color="#6b7280"),
+            title_font=dict(size=15, color="#1f2937"),
+            showgrid=False,
+        ),
+        yaxis=dict(
+            tickfont=dict(size=11, color="#6b7280"),
+            title_font=dict(size=15, color="#1f2937"),
+            gridcolor="#e5e7eb",
+        ),
+    )
+    return fig
+
 # -----------------------------------------------
-# Chart 1 — Stress: Beginning vs End of Semester (Teal Theme)
+# Chart 1 — Stress Start vs End
 # -----------------------------------------------
 def stress_start_end_chart(df):
     avg_start = df["stress_start"].mean()
     avg_end = df["stress_end"].mean()
-    pct_change = ((avg_end - avg_start) / avg_start) * 100
+    pct_change = ((avg_end - avg_start) / avg_start) * 100 if avg_start else 0
 
     fig = go.Figure()
     fig.add_trace(
@@ -55,47 +81,64 @@ def stress_start_end_chart(df):
             textposition="outside",
             marker=dict(color=["#64c7c8", "#f27d72"]),
             width=[0.45, 0.45],
+            hovertemplate="<b>%{x}</b><br>Average Stress: <b>%{y:.2f}</b><extra></extra>",
         )
     )
+
     fig.update_layout(
-        template="plotly_white",
-        height=320,
-        margin=dict(l=20, r=20, t=20, b=20),
         yaxis=dict(title="Average Stress Level", range=[0, 5.5]),
-        xaxis=dict(title=""),
-        paper_bgcolor="white",
-        plot_bgcolor="white",
+        xaxis=dict(title="Semester Phase"),
         showlegend=False,
     )
-    
-    # ONE COMPLETE GROUP - everything inside one container
+    fig = apply_chart_style(fig, height=340)
+
     with st.container():
-        st.markdown(f'''
-        <div class="chart-group card-teal">
-            <div class="group-header">
-                <div class="group-kicker">SEMESTER COMPARISON</div>
-                <h3 class="group-title">Stress Levels: Start vs End of Semester</h3>
-                <p class="group-subtitle">Average stress increases as the semester progresses toward exams.</p>
+        st.markdown(
+            '''
+            <div class="chart-group card-teal">
+                <div class="group-header">
+                    <div class="group-kicker">SEMESTER COMPARISON</div>
+                    <h3 class="group-title">Stress Levels: Beginning vs End of Semester</h3>
+                    <p class="group-subtitle">Average stress increases as the semester progresses toward exams.</p>
+                </div>
             </div>
-        </div>
-        ''', unsafe_allow_html=True)
-        
+            ''',
+            unsafe_allow_html=True,
+        )
+
         st.plotly_chart(fig, use_container_width=True, key="stress_start_end")
-        
-        st.markdown(f'''
-        <div class="group-insight insight-teal">
-            <div class="insight-icon">📊</div>
-            <div class="insight-content">
-                <div class="insight-title">KEY INSIGHT</div>
-                <div class="insight-text">Stress increases by {pct_change:.0f}% as exams approach. Students report peak anxiety in the final weeks of the semester.</div>
+
+        st.markdown(
+            f'''
+            <div class="group-insight insight-teal">
+                <div class="insight-icon">📊</div>
+                <div class="insight-content">
+                    <div class="insight-title">KEY INSIGHT</div>
+                    <div class="insight-text">
+                        Students' stress levels increase noticeably over the course of the semester, rising from
+                        <strong>{avg_start:.2f}</strong> at the beginning to <strong>{avg_end:.2f}</strong> by the end.
+                        This represents an increase of approximately <strong>{pct_change:.0f}%</strong>, indicating
+                        that academic pressure becomes much heavier as assignments, deadlines, and examinations approach.
+                    </div>
+                    <div class="insight-text">
+                        Rather than remaining constant, stress builds gradually and reaches its highest point in the
+                        final weeks of the semester, when multiple academic demands occur at the same time.
+                    </div>
+                    <div class="insight-title">OVERALL TAKEAWAY:</div>
+                    <div class="insight-text">
+                        <strong>Stress tends to peak toward the end of the semester due to increasing academic demands.</strong>
+                        This highlights the importance of early preparation and effective time management to reduce last-minute pressure.
+                    </div>
+                </div>
             </div>
-        </div>
-        ''', unsafe_allow_html=True)
+            ''',
+            unsafe_allow_html=True,
+        )
 
 
-# --------------------------------------------------------
-# Chart 2 — Stress vs Procrastination (Orange Theme)
-# --------------------------------------------------------
+# -----------------------------------------------
+# Chart 2 — Stress vs Procrastination
+# -----------------------------------------------
 def stress_vs_procrastination_chart(df):
     proc_levels = [1, 2, 3, 4, 5]
 
@@ -107,10 +150,10 @@ def stress_vs_procrastination_chart(df):
         df[df["procrastination_level"] == p]["stress_end"].mean()
         for p in proc_levels
     ]
-    
-    low_proc_stress = avg_end[0] if len(avg_end) > 0 else 0
-    high_proc_stress = avg_end[4] if len(avg_end) > 4 else 0
-    stress_ratio = high_proc_stress / low_proc_stress if low_proc_stress > 0 else 0
+
+    low_proc_stress = avg_end[0] if pd.notna(avg_end[0]) else 0
+    high_proc_stress = avg_end[4] if pd.notna(avg_end[4]) else 0
+    stress_ratio = high_proc_stress / low_proc_stress if low_proc_stress else 0
 
     fig = go.Figure()
     fig.add_trace(
@@ -119,8 +162,9 @@ def stress_vs_procrastination_chart(df):
             y=avg_begin,
             name="Beginning",
             marker=dict(color="#64c7c8"),
-            text=[f"{v:.1f}" for v in avg_begin],
+            text=[f"{v:.1f}" if pd.notna(v) else "" for v in avg_begin],
             textposition="outside",
+            hovertemplate="<b>%{x}</b><br>Beginning Stress: <b>%{y:.1f}</b><extra></extra>",
         )
     )
     fig.add_trace(
@@ -129,48 +173,292 @@ def stress_vs_procrastination_chart(df):
             y=avg_end,
             name="End",
             marker=dict(color="#f27d72"),
-            text=[f"{v:.1f}" for v in avg_end],
+            text=[f"{v:.1f}" if pd.notna(v) else "" for v in avg_end],
             textposition="outside",
+            hovertemplate="<b>%{x}</b><br>End Stress: <b>%{y:.1f}</b><extra></extra>",
         )
     )
+
     fig.update_layout(
-        template="plotly_white",
-        height=320,
-        margin=dict(l=20, r=20, t=20, b=20),
         barmode="group",
         yaxis=dict(title="Average Stress Level", range=[0, 5.8]),
         xaxis=dict(title="Procrastination Level"),
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        legend=dict(orientation="h", y=1.12, x=0),
+        legend=dict(orientation="h", y=1.10, x=0),
     )
-    
-    with st.container():
-        st.markdown(f'''
-        <div class="chart-group card-orange">
-            <div class="group-header">
-                <div class="group-kicker">BEHAVIORAL CORRELATION</div>
-                <h3 class="group-title">Stress vs Procrastination Level</h3>
-                <p class="group-subtitle">Higher procrastination = steeper stress growth by semester end.</p>
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
-        
-        st.plotly_chart(fig, use_container_width=True, key="stress_procrastination")
-        
-        st.markdown(f'''
-        <div class="group-insight insight-orange">
-            <div class="insight-icon">⚠️</div>
-            <div class="insight-content">
-                <div class="insight-title">CRITICAL FINDING</div>
-                <div class="insight-text">High procrastinators experience {stress_ratio:.1f}x more stress ({high_proc_stress:.1f} vs {low_proc_stress:.1f}). Delaying work compounds pressure exponentially.</div>
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
+    fig = apply_chart_style(fig, height=320)
 
+    with st.container():
+        st.markdown(
+            '''
+            <div class="chart-group card-orange">
+                <div class="group-header">
+                    <div class="group-kicker">BEHAVIORAL CORRELATION</div>
+                    <h3 class="group-title">Stress Levels vs Procrastination Levels</h3>
+                    <p class="group-subtitle">Higher procrastination is strongly associated with increased end-of-semester stress, suggesting that delaying tasks allows academic pressure to accumulate over time.</p>
+                </div>
+            </div>
+            ''',
+            unsafe_allow_html=True,
+        )
+
+        st.plotly_chart(fig, use_container_width=True, key="stress_procrastination")
+
+        st.markdown(
+            f'''
+            <div class="group-insight insight-orange">
+                <div class="insight-icon">⚠️</div>
+                <div class="insight-content">
+                    <div class="insight-title">KEY INSIGHT</div>
+                    <div class="insight-text">
+                        Students with higher levels of procrastination tend to experience much greater stress by the end
+                        of the semester. While beginning-of-semester stress is relatively similar across most groups,
+                        the gap becomes much clearer over time.
+                    </div>
+                    <div class="insight-text">
+                        At the highest level of procrastination, end-of-semester stress rises to around
+                        <strong>{high_proc_stress:.1f}</strong>, compared with only <strong>{low_proc_stress:.1f}</strong>
+                        for those at the lowest level. This means that students who procrastinate the most experience
+                        about <strong>{stress_ratio:.1f} times</strong> the stress by semester end.
+                    </div>
+                    <div class="insight-title">OVERALL TAKEAWAY:</div>
+                    <div class="insight-text">
+                        <strong>Higher procrastination is strongly associated with increased stress, especially toward the end
+                        of the semester.</strong> Managing tasks earlier and avoiding excessive delay can help reduce the buildup
+                        of pressure and lead to a more manageable workload.
+                    </div>
+                </div>
+            </div>
+            ''',
+            unsafe_allow_html=True,
+        )
 
 # -----------------------------------------------
-# Chart 3 — Study Method Treemap (Purple Theme)
+# Chart 4 — Study Hours Per Day vs Stress
+# -----------------------------------------------
+def study_hours_vs_stress_chart(df):
+    # Create study hours categories
+    def categorize_hours(hours):
+        if hours <= 2:
+            return "Low (0-2 hours)"
+        elif hours <= 4:
+            return "Moderate (3-4 hours)"
+        elif hours <= 6:
+            return "High (5-6 hours)"
+        else:
+            return "Very High (7+ hours)"
+    
+    df_copy = df.copy()
+    df_copy["study_category"] = df_copy["study_hours_before_exam"].apply(categorize_hours)
+    
+    # Calculate average stress by study hours category
+    summary = (
+        df_copy.groupby("study_category", as_index=False)
+        .agg(
+            avg_stress_start=("stress_start", "mean"),
+            avg_stress_end=("stress_end", "mean"),
+            student_count=("study_category", "size")
+        )
+    )
+    
+    # Define order for categories
+    category_order = ["Low (0-2 hours)", "Moderate (3-4 hours)", "High (5-6 hours)", "Very High (7+ hours)"]
+    summary["study_category"] = pd.Categorical(summary["study_category"], categories=category_order, ordered=True)
+    summary = summary.sort_values("study_category")
+    
+    fig = go.Figure()
+    
+    # Add traces for beginning and end stress
+    fig.add_trace(
+        go.Bar(
+            x=summary["study_category"],
+            y=summary["avg_stress_start"],
+            name="Beginning of Semester",
+            marker=dict(color="#64c7c8"),
+            text=[f"{v:.2f}" for v in summary["avg_stress_start"]],
+            textposition="outside",
+            hovertemplate="<b>Study Hours:</b> %{x}<br><b>Beginning Stress:</b> %{y:.2f}<extra></extra>",
+        )
+    )
+    
+    fig.add_trace(
+        go.Bar(
+            x=summary["study_category"],
+            y=summary["avg_stress_end"],
+            name="End of Semester",
+            marker=dict(color="#f27d72"),
+            text=[f"{v:.2f}" for v in summary["avg_stress_end"]],
+            textposition="outside",
+            hovertemplate="<b>Study Hours:</b> %{x}<br><b>End Stress:</b> %{y:.2f}<extra></extra>",
+        )
+    )
+    
+    fig.update_layout(
+        barmode="group",
+        yaxis=dict(title="Average Stress Level", range=[0, 5.5]),
+        xaxis=dict(title="Daily Study Hours"),
+        legend=dict(orientation="h", y=1.10, x=0),
+    )
+    fig = apply_chart_style(fig, height=320)
+    
+    with st.container():
+        st.markdown(
+            '''
+            <div class="chart-group card-purple">
+                <div class="group-header">
+                    <div class="group-kicker">STUDY HABITS ANALYSIS</div>
+                    <h3 class="group-title">Stress Levels vs  Daily Study Hours</h3>
+                    <p class="group-subtitle">Comparing stress levels across different daily study durations.</p>
+                </div>
+            </div>
+            ''',
+            unsafe_allow_html=True,
+        )
+        
+        st.plotly_chart(fig, use_container_width=True, key="study_hours_vs_stress")
+        
+        st.markdown(
+            '''
+            <div class="group-insight insight-purple">
+                <div class="insight-icon">📚</div>
+                <div class="insight-content">
+                    <div class="insight-title">KEY INSIGHT</div>
+                    <div class="insight-text">
+                         Longer daily study hours appear to reflect academic pressure rather 
+                         than guarantee stronger academic outcomes. This suggests that increasing study time alone is not enough; 
+                         how students manage their workload matters more.
+                    </div>
+                    <div class="insight-title">OVERALL TAKEAWAY:</div>
+                    <div class="insight-text">
+                       <strong>Study intensity appears to be linked with higher stress levels,</strong> but this relationship likely reflects academic pressure 
+            rather than study hours alone. Managing workload early and maintaining consistent study habits may help reduce stress buildup.
+                    </div>
+                </div>
+            </div>
+            ''',
+            unsafe_allow_html=True,
+        )
+
+# -----------------------------------------------
+# Chart 4 — Stress Comparison (Beginning vs End) by CGPA
+# -----------------------------------------------
+def stress_vs_cgpa_chart(df):
+    # Create CGPA groups based on your ratios
+    def get_cgpa_group(cgpa):
+        if cgpa < 2.00:
+            return "Below 2.00"
+        elif cgpa < 3.00:
+            return "2.00 - 2.99"
+        elif cgpa < 4.00:
+            return "3.00 - 3.99"
+        else:
+            return "4.00"
+    
+    df_copy = df.copy()
+    df_copy["cgpa_group"] = df_copy["cgpa"].apply(get_cgpa_group)
+    
+    # Calculate stress metrics by CGPA group
+    summary = (
+        df_copy.groupby("cgpa_group", as_index=False)
+        .agg(
+            avg_stress_start=("stress_start", "mean"),
+            avg_stress_end=("stress_end", "mean"),
+            student_count=("cgpa_group", "size")
+        )
+    )
+    
+    # Calculate stress difference
+    summary["stress_difference"] = summary["avg_stress_end"] - summary["avg_stress_start"]
+    
+    # Define order for CGPA groups
+    group_order = ["Below 2.00", "2.00 - 2.99", "3.00 - 3.99", "4.00"]
+    summary["cgpa_group"] = pd.Categorical(summary["cgpa_group"], categories=group_order, ordered=True)
+    summary = summary.sort_values("cgpa_group")
+    
+    fig = go.Figure()
+    
+    # Add bars for beginning stress
+    fig.add_trace(
+        go.Bar(
+            name="Beginning of Semester",
+            x=summary["cgpa_group"],
+            y=summary["avg_stress_start"],
+            marker=dict(color="#64c7c8"),
+            text=[f"{v:.2f}" for v in summary["avg_stress_start"]],
+            textposition="outside",
+            hovertemplate="<b>CGPA Group:</b> %{x}<br><b>Beginning Stress:</b> %{y:.2f}<extra></extra>",
+        )
+    )
+    
+    # Add bars for end stress
+    fig.add_trace(
+        go.Bar(
+            name="End of Semester",
+            x=summary["cgpa_group"],
+            y=summary["avg_stress_end"],
+            marker=dict(color="#f27d72"),
+            text=[f"{v:.2f}" for v in summary["avg_stress_end"]],
+            textposition="outside",
+            hovertemplate="<b>CGPA Group:</b> %{x}<br><b>End Stress:</b> %{y:.2f}<extra></extra>",
+        )
+    )
+    
+    fig.update_layout(
+        barmode="group",
+        yaxis=dict(title="Average Stress Level", range=[0, 5.5]),
+        xaxis=dict(title="CGPA Group"),
+        legend=dict(orientation="h", y=1.10, x=0),
+    )
+    fig = apply_chart_style(fig, height=320)
+    
+    with st.container():
+        st.markdown(
+            '''
+            <div class="chart-group card-blue">
+                <div class="group-header">
+                    <div class="group-kicker">STRESS COMPARISON</div>
+                    <h3 class="group-title">Stress Levels by CGPA Group</h3>
+                    <p class="group-subtitle">Comparing how stress changes across the semester for different performance levels.</p>
+                </div>
+            </div>
+            ''',
+            unsafe_allow_html=True,
+        )
+        
+        st.plotly_chart(fig, use_container_width=True, key="stress_vs_cgpa")
+        
+        # Calculate insights
+        below_2_start = summary[summary["cgpa_group"] == "Below 2.00"]["avg_stress_start"].values[0] if len(summary[summary["cgpa_group"] == "Below 2.00"]) > 0 else 0
+        below_2_end = summary[summary["cgpa_group"] == "Below 2.00"]["avg_stress_end"].values[0] if len(summary[summary["cgpa_group"] == "Below 2.00"]) > 0 else 0
+        below_2_diff = below_2_end - below_2_start
+        
+        cgpa_4_start = summary[summary["cgpa_group"] == "4.00"]["avg_stress_start"].values[0] if len(summary[summary["cgpa_group"] == "4.00"]) > 0 else 0
+        cgpa_4_end = summary[summary["cgpa_group"] == "4.00"]["avg_stress_end"].values[0] if len(summary[summary["cgpa_group"] == "4.00"]) > 0 else 0
+        cgpa_4_diff = cgpa_4_end - cgpa_4_start
+        
+        st.markdown(
+            f'''
+            <div class="group-insight insight-blue">
+                <div class="insight-icon">📊</div>
+                <div class="insight-content">
+                    <div class="insight-title">KEY INSIGHT</div>
+                    <div class="insight-text">
+                    Stress increases across all CGPA groups,
+                    but the pattern is not the same for every student. 
+                    <strong>Mid-performing students show the sharpest rise, while top-performing students appear to maintain more stable stress levels.</strong>
+                    </div>
+                    <div class="insight-title">OVERALL TAKEAWAY:</div>
+                    <div class="insight-text">
+                        This suggests that academic performance may depend not only on pressure itself, but also on how students manage it
+                    </div>
+                </div>
+            </div>
+            ''',
+            unsafe_allow_html=True,
+        )
+        
+        
+# -----------------------------------------------
+# Chart 5— Study Method Treemap (Purple Theme)
 # -----------------------------------------------
 def study_method_vs_cgpa_chart(df):
     import plotly.express as px
@@ -368,7 +656,7 @@ def study_method_vs_cgpa_chart(df):
         ''', unsafe_allow_html=True)
 
 # -----------------------------------------------
-# Chart 4 — Procrastination Penalty (Red Theme) — Enhanced
+# Chart 6 — Procrastination Penalty (Red Theme) — Enhanced
 # -----------------------------------------------
 def procrastination_vs_cgpa_chart(df):
     """
@@ -499,128 +787,79 @@ def procrastination_vs_cgpa_chart(df):
         </div>
         ''', unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# Chart 5 — Sleep Impact (Blue Theme)
-# ---------------------------------------------------------
-def sleep_chart(df):
-    summary = (
-        df.groupby("sleep_hours", as_index=False)
-        .agg(avg_cgpa=("cgpa", "mean"), avg_stress=("stress_end", "mean"))
-        .sort_values("sleep_hours")
-    )
-
-    summary["cgpa_norm"] = (summary["avg_cgpa"] / 4.0) * 100
-    summary["stress_norm"] = (summary["avg_stress"] / 5.0) * 100
-    
-    if len(summary) > 0:
-        optimal_idx = summary["avg_cgpa"].idxmax()
-        optimal_sleep = summary.loc[optimal_idx, "sleep_hours"]
-        optimal_cgpa = summary["avg_cgpa"].max()
-        optimal_stress = summary.loc[optimal_idx, "avg_stress"]
-    else:
-        optimal_sleep, optimal_cgpa, optimal_stress = 7, 3.5, 4.0
-
-    fig = go.Figure()
-    fig.add_trace(
-        go.Scatter(
-            x=summary["sleep_hours"],
-            y=summary["cgpa_norm"],
-            mode="lines+markers",
-            name="CGPA",
-            line=dict(color="#22c7f0", width=3),
-            marker=dict(size=8),
-        )
-    )
-    fig.add_trace(
-        go.Scatter(
-            x=summary["sleep_hours"],
-            y=summary["stress_norm"],
-            mode="lines+markers",
-            name="Stress",
-            line=dict(color="#ef7a7a", width=3),
-            marker=dict(size=8),
-        )
-    )
-    fig.update_layout(
-        template="plotly_white",
-        height=340,
-        margin=dict(l=20, r=20, t=20, b=20),
-        xaxis=dict(title="Sleep Hours"),
-        yaxis=dict(title="Normalized Score (%)", range=[0, 100]),
-        legend=dict(orientation="h", y=1.1),
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-    )
-    
-    with st.container():
-        st.markdown(f'''
-        <div class="chart-group card-blue">
-            <div class="group-header">
-                <div class="group-kicker">DUAL-AXIS ANALYSIS</div>
-                <h3 class="group-title">Sleep Impact Analysis</h3>
-                <p class="group-subtitle">Sleep influences both stress levels and academic outcomes.</p>
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
-        
-        st.plotly_chart(fig, use_container_width=True, key="sleep_impact")
-        
-        st.markdown(f'''
-        <div class="group-insight insight-blue">
-            <div class="insight-icon">😴</div>
-            <div class="insight-content">
-                <div class="insight-title">SWEET SPOT IDENTIFIED</div>
-                <div class="insight-text">{optimal_sleep:.0f}-{optimal_sleep+1:.0f} hours maximizes CGPA ({optimal_cgpa:.1f}) while minimizing stress ({optimal_stress:.1f}).</div>
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
-
 
 def show_behavioral_insights():
     load_css()
     df = load_data()
 
-    # Section 1: Stress
-    st.markdown('<h1 class="page-title">What Really Drives Academic Performance?</h1>', unsafe_allow_html=True)
-    st.markdown('<div class="section-tag stress-tag">STRESS ANALYSIS</div>', unsafe_allow_html=True)
-    st.markdown('<h2 class="subpage-title">Academic Pressure builds Over time</h2>', unsafe_allow_html=True)
-    st.markdown('<p class="page-subtitle">Examining how stress evolves throughout the semester and its relationship with procrastination.</p>', unsafe_allow_html=True)
+    # =========================
+    # PAGE TITLE
+    # =========================
+    st.markdown(
+        '<h1 class="page-title">How Stress and Habits Shape Academic Performance</h1>',
+        unsafe_allow_html=True,
+    )
 
+    # =========================
+    # STRESS ANALYSIS
+    # =========================
+    st.markdown('<div class="section-tag stress-tag">STRESS ANALYSIS</div>', unsafe_allow_html=True)
+    st.markdown('<h2 class="subpage-title">Academic Pressure Builds Over Time</h2>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="page-subtitle">Examining how stress evolves throughout the semester and how student habits relate to rising pressure.</p>',
+        unsafe_allow_html=True,
+    )
+
+    # First row - Stress comparison charts
     col1, col2 = st.columns(2, gap="large")
     with col1:
         stress_start_end_chart(df)
     with col2:
         stress_vs_procrastination_chart(df)
 
-    # Section 2: Behavioral Insights
+    # Second row - Performance relationship charts
+    col3, col4 = st.columns(2, gap="large")
+    with col3:
+        study_hours_vs_stress_chart(df)
+    with col4:
+        stress_vs_cgpa_chart(df)
+
+    # =========================
+    # METHODS & HABITS
+    # =========================
     st.markdown('<div class="section-divider"><span>STUDY QUALITY &amp; LIFESTYLE</span></div>', unsafe_allow_html=True)
     st.markdown('<div class="section-tag habits-tag">METHODS &amp; HABITS</div>', unsafe_allow_html=True)
-    st.markdown('<h2 class="subpage-title">How Methods &amp; Habits Impact Results</h2>', unsafe_allow_html=True)
-    st.markdown('<p class="page-subtitle">Understanding the relationship between study techniques, procrastination, sleep habits, and academic success.</p>', unsafe_allow_html=True)
+    st.markdown('<h2 class="subpage-title">How Study Behavior Relates to Performance</h2>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="page-subtitle">Examining how stress evolves throughout the semester and how student behavior may contribute to rising academic pressure.</p>',
+        unsafe_allow_html=True,
+    )
 
     # Treemap - full width row
     study_method_vs_cgpa_chart(df)
-    
-    # Two column row below treemap
-    col3, col4 = st.columns(2, gap="large")
-    with col3:
-        procrastination_vs_cgpa_chart(df)
-    with col4:
-        sleep_chart(df)
+    procrastination_vs_cgpa_chart(df)
+
+
+
+
 
     # Summary banner
     st.markdown('''
     <div class="highlight-banner">
         <h3>📊 Key Takeaways</h3>
-        <p>✅ Active learning methods significantly outperform passive reading</p>
-        <p>✅ High procrastination leads to 2.1x more stress and 25% lower CGPA</p>
-        <p>✅ 7-8 hours of sleep is the optimal range for academic success</p>
-        <p>✅ Consistent studying beats last-minute cramming for long-term retention</p>
+        <p>✅ Study duration shows only a very weak relationship with CGPA</p>
+        <p>✅ Stress increases significantly throughout the semester</p>
+        <p>✅ Procrastination is strongly linked to higher end-of-semester stress</p>
+        <p>✅ Active study methods are more closely associated with stronger academic performance</p>
+        <p>✅ Academic success appears to depend more on study quality, behavior, and stress management than on study hours alone</p>
     </div>
     ''', unsafe_allow_html=True)
 
-    st.page_link("pages/recommendations.py", label="Go to Recommendations Page")
-
-
+    left_empty, center_col, right_empty = st.columns([1, 2, 1])
+    with center_col:
+        # Hidden button for navigation trigger
+        if st.button(":material/analytics: Go to Recommendations", key="hidden_nav_btn", 
+                    type="primary", use_container_width=True, help="Navigate to detailed analysis"):
+            st.switch_page(("pages/recommendations.py"))
 if __name__ == "__main__":
-    show_behavioral_insights()
+            show_behavioral_insights()

@@ -284,14 +284,11 @@ st.markdown("""
         <div style="width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #a855f7;"></div>
         <div style="height: 1px; width: 3rem; background: linear-gradient(270deg, transparent, #c084fc);"></div>
     </div>
-    <div class="bridge-quote">
-        Two stories. Two completely different approaches. One common goal: <span style="color: #9333ea; font-weight: 700;">academic success</span>.
-    </div>
     <div class="bridge-question">
-        These contrasting stories raise a fundamental question that affects millions of students worldwide:
+        These real-world cases raise an important question:
     </div>
     <div class="bridge-highlight">
-        Is academic success determined by the quantity of study time, or the quality of study habits?
+        Does studying longer really improve academic performance, or do study quality, time management, and behavioral habits matter more?
     </div>
 </div>
 """, unsafe_allow_html=True)
